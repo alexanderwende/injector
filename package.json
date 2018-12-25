@@ -1,0 +1,43 @@
+{
+  "name": "injector",
+  "version": "1.0.0",
+  "description": "Dependency Injection Container",
+  "keywords": [
+    "dependency injection",
+    "inversion of control",
+    "di",
+    "ioc",
+    "provider",
+    "decorator",
+    "injector"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "webpack",
+    "build:watch": "webpack --watch",
+    "test": "karma start karma.config.js"
+  },
+  "author": "Alexander Wende",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jasmine": "^3.3.4",
+    "clean-webpack-plugin": "^1.0.0",
+    "jasmine-core": "^3.3.0",
+    "karma": "^3.1.4",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-typescript": "^3.0.13",
+    "reflect-metadata": "^0.1.12",
+    "ts-loader": "^5.3.1",
+    "tslint": "^5.12.0",
+    "tslint-clean-code": "^0.2.9",
+    "typescript": "^3.2.2",
+    "webpack": "^4.28.0",
+    "webpack-cli": "^3.1.2"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "^0.1.12"
+  }
+}
