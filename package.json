@@ -11,18 +11,18 @@
     "decorator",
     "injector"
   ],
-  "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
   "scripts": {
-    "build": "webpack",
-    "build:watch": "webpack --watch",
+    "build": "rollup -c",
+    "build:watch": "rollup -c -w",
     "test": "karma start karma.config.js"
   },
   "author": "Alexander Wende",
   "license": "MIT",
   "devDependencies": {
     "@types/jasmine": "^3.3.4",
-    "clean-webpack-plugin": "^1.0.0",
     "jasmine-core": "^3.3.0",
     "karma": "^3.1.4",
     "karma-chrome-launcher": "^2.2.0",
@@ -30,12 +30,11 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-typescript": "^3.0.13",
     "reflect-metadata": "^0.1.12",
-    "ts-loader": "^5.3.1",
+    "rollup": "^0.68.2",
+    "rollup-plugin-typescript2": "^0.18.1",
     "tslint": "^5.12.0",
     "tslint-clean-code": "^0.2.9",
-    "typescript": "^3.2.2",
-    "webpack": "^4.28.0",
-    "webpack-cli": "^3.1.2"
+    "typescript": "^3.2.2"
   },
   "peerDependencies": {
     "reflect-metadata": "^0.1.12"
