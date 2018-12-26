@@ -253,3 +253,4 @@ class Injector {
 }
 
 export { metadataKeys as ANNOTATION, getTokenAnnotation, setTokenAnnotation, getParameterAnnotation, getParameterAnnotations, ensureParameterAnnotations, getPropertyAnnotation, getPropertyAnnotations, ensurePropertyAnnotations, ensurePropertyAnnotation, createParameterAnnotation, createPropertyAnnotation, isConstructor, isSymbol, inject, injectable, optional, createClassFactory, createSingletonFactory, createValueFactory, PROVIDER_UNREGISTERED, BaseProvider, ClassProvider$$1 as ClassProvider, SingletonProvider, ValueProvider, InjectToken, CLASS_NOT_INJECTABLE, NO_PROVIDER, Injector };
+//# sourceMappingURL=index.esm.js.map

@@ -285,3 +285,4 @@ exports.InjectToken = InjectToken;
 exports.CLASS_NOT_INJECTABLE = CLASS_NOT_INJECTABLE;
 exports.NO_PROVIDER = NO_PROVIDER;
 exports.Injector = Injector;
+//# sourceMappingURL=index.cjs.js.map
