@@ -1,4 +1,4 @@
-import { Constructor, isConstructor, isSymbol } from './decorators';
+import { Constructor, isConstructor, isSymbol } from './utils';
 
 export class InjectToken<T = any> {
 

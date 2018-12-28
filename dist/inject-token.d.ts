@@ -1,4 +1,4 @@
-import { Constructor } from './decorators';
+import { Constructor } from './utils';
 export declare class InjectToken<T = any> {
     description: string;
     value: Symbol;

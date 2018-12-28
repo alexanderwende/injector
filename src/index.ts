@@ -1,3 +1,4 @@
+export { Constructor, isSymbol, isConstructor } from './utils';
 export * from './annotations';
 export * from './decorators';
 export * from './factories';

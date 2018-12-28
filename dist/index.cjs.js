@@ -2,6 +2,13 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+const isConstructor = (constructorFn) => {
+    return constructorFn instanceof Function && constructorFn.prototype && constructorFn.prototype.constructor === constructorFn;
+};
+const isSymbol = (symbol) => {
+    return typeof symbol === 'symbol';
+};
+
 const DESIGN_TYPE = 'design:type';
 const DESIGN_PARAMETER_TYPES = 'design:paramtypes';
 const TOKEN = 'ioc:token';
@@ -66,23 +73,6 @@ const createPropertyAnnotation = (token, optional = false) => ({
     optional: optional
 });
 
-const inject = (token) => {
-    return (target, propertyKey, parameterIndex) => {
-        if (typeof parameterIndex === 'number') {
-            // decorator is a parameter decorator
-            const parameterAnnotation = getParameterAnnotation(target, parameterIndex);
-            parameterAnnotation.token = token;
-            // console.log('inject()... ', parameterAnnotation);
-        }
-        else {
-            // decorator is a property decorator
-            const propertyAnnotation = getPropertyAnnotation(target.constructor, propertyKey);
-            propertyAnnotation.token = token;
-            // console.log('inject()... ', propertyAnnotation);
-        }
-    };
-};
-
 class InjectToken {
     constructor(value) {
         if (isConstructor(value)) {
@@ -99,6 +89,31 @@ class InjectToken {
         }
     }
 }
+
+const inject = (constructorOrToken) => {
+    return (target, propertyKey, parameterIndex) => {
+        const isParameterDecorator = typeof parameterIndex === 'number';
+        const token = (constructorOrToken instanceof InjectToken) ?
+            constructorOrToken :
+            (constructorOrToken instanceof Function) ?
+                getTokenAnnotation(constructorOrToken) :
+                (isParameterDecorator) ?
+                    getParameterAnnotation(target, parameterIndex).token :
+                    getPropertyAnnotation(target.constructor, propertyKey).token;
+        if (isParameterDecorator) {
+            // decorator is a parameter decorator
+            const parameterAnnotation = getParameterAnnotation(target, parameterIndex);
+            parameterAnnotation.token = token;
+            // console.log('inject()... ', parameterAnnotation);
+        }
+        else {
+            // decorator is a property decorator
+            const propertyAnnotation = getPropertyAnnotation(target.constructor, propertyKey);
+            propertyAnnotation.token = token;
+            // console.log('inject()... ', propertyAnnotation);
+        }
+    };
+};
 
 const injectable = () => {
     return (target) => {
@@ -120,13 +135,6 @@ const optional = () => {
             propertyAnnotation.optional = true;
         }
     };
-};
-
-const isConstructor = (constructorFn) => {
-    return constructorFn instanceof Function && constructorFn.prototype && constructorFn.prototype.constructor === constructorFn;
-};
-const isSymbol = (symbol) => {
-    return typeof symbol === 'symbol';
 };
 
 const createClassFactory = (constructorFn) => {
@@ -156,16 +164,18 @@ class BaseProvider {
         this.dependencies = dependencies;
         this.properties = properties;
     }
-    provide() {
-        if (!this.injector)
+    provide(injector) {
+        if (!injector)
+            injector = this.injector;
+        if (!injector)
             throw PROVIDER_UNREGISTERED;
         // console.group('Provider.provide()');
         // console.log('provider: ', this);
         // console.log('resolving dependencies: ', this.dependencies);
-        const dependencies = this._resolveDependencies();
+        const dependencies = this._resolveDependencies(injector);
         // console.log('resolved dependencies: ', dependencies);
         // console.log('resolving properties: ', this.properties);
-        const properties = this._resolveProperties();
+        const properties = this._resolveProperties(injector);
         // console.log('resolved properties: ', properties);
         // console.groupEnd();
         return this._createValue(dependencies, properties);
@@ -174,24 +184,24 @@ class BaseProvider {
         const value = this.factory(...dependencies);
         return (value instanceof Object) ? Object.assign(value, properties) : value;
     }
-    _resolveDependencies() {
-        return this.dependencies.map(dependency => this.injector.resolve(dependency.token, dependency.optional));
+    _resolveDependencies(injector) {
+        return this.dependencies.map(dependency => injector.resolve(dependency.token, dependency.optional));
     }
-    _resolveProperties() {
+    _resolveProperties(injector) {
         return Object.entries(this.properties).reduce((result, [key, value]) => {
-            result[key] = this.injector.resolve(value.token, value.optional);
+            result[key] = injector.resolve(value.token, value.optional);
             return result;
         }, {});
     }
 }
 
-class ClassProvider$$1 extends BaseProvider {
+class ClassProvider extends BaseProvider {
     constructor(constructorFn, dependencies, properties) {
         super(createClassFactory(constructorFn), dependencies || getParameterAnnotations(constructorFn), properties || getPropertyAnnotations(constructorFn));
     }
 }
 
-class SingletonProvider extends ClassProvider$$1 {
+class SingletonProvider extends ClassProvider {
     provide() {
         if (!this._instance)
             this._instance = super.provide();
@@ -208,8 +218,11 @@ class ValueProvider extends BaseProvider {
 const CLASS_NOT_INJECTABLE = (constructorFn) => new Error(`Class '${constructorFn.name}' has not been decorated as injectable and cannot be resolved.`);
 const NO_PROVIDER = (token) => new Error(`No provider has been found for the requested token '${token.description}'.`);
 class Injector {
-    constructor() {
+    constructor(parent) {
         this._registry = new Map();
+        this._parent = null;
+        if (parent)
+            this._parent = parent;
     }
     provide(constructorOrToken, provider) {
         const token = constructorOrToken instanceof InjectToken ?
@@ -241,21 +254,32 @@ class Injector {
         if (!token)
             throw CLASS_NOT_INJECTABLE(constructorFn);
         // class has no provider yet, we create one
-        if (!this._registry.has(token))
-            this.provide(token, new ClassProvider$$1(constructorFn));
+        if (!this._getProvider(token)) {
+            this.provide(token, new ClassProvider(constructorFn));
+        }
         return this._resolveToken(token, optional);
     }
     _resolveToken(token, optional = false) {
-        const provider = this._registry.get(token);
+        const provider = this._getProvider(token);
         if (!provider) {
             if (!optional)
                 throw NO_PROVIDER(token);
             return undefined;
         }
-        return provider.provide();
+        return provider.provide(this);
+    }
+    _getProvider(token) {
+        if (this._registry.has(token)) {
+            return this._registry.get(token);
+        }
+        else if (this._parent) {
+            return this._parent._getProvider(token);
+        }
     }
 }
 
+exports.isSymbol = isSymbol;
+exports.isConstructor = isConstructor;
 exports.ANNOTATION = metadataKeys;
 exports.getTokenAnnotation = getTokenAnnotation;
 exports.setTokenAnnotation = setTokenAnnotation;
@@ -268,8 +292,6 @@ exports.ensurePropertyAnnotations = ensurePropertyAnnotations;
 exports.ensurePropertyAnnotation = ensurePropertyAnnotation;
 exports.createParameterAnnotation = createParameterAnnotation;
 exports.createPropertyAnnotation = createPropertyAnnotation;
-exports.isConstructor = isConstructor;
-exports.isSymbol = isSymbol;
 exports.inject = inject;
 exports.injectable = injectable;
 exports.optional = optional;
@@ -278,7 +300,7 @@ exports.createSingletonFactory = createSingletonFactory;
 exports.createValueFactory = createValueFactory;
 exports.PROVIDER_UNREGISTERED = PROVIDER_UNREGISTERED;
 exports.BaseProvider = BaseProvider;
-exports.ClassProvider = ClassProvider$$1;
+exports.ClassProvider = ClassProvider;
 exports.SingletonProvider = SingletonProvider;
 exports.ValueProvider = ValueProvider;
 exports.InjectToken = InjectToken;

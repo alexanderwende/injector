@@ -1,7 +1,7 @@
-import { Constructor } from '../decorators';
-import { createClassFactory } from '../factories';
 import { getParameterAnnotations, getPropertyAnnotations, ParameterAnnotation, PropertyAnnotation } from '../annotations';
-import { BaseProvider } from './index';
+import { createClassFactory } from '../factories';
+import { Constructor } from '../utils';
+import { BaseProvider } from './base-provider';
 
 export class ClassProvider<T> extends BaseProvider<T> {
 

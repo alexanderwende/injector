@@ -65,6 +65,8 @@ class Warrior {
     }
 }
 
+
+
 // create an injector
 const injector = new Injector();
 
@@ -72,5 +74,26 @@ const injector = new Injector();
 injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
 injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
 
+// create an instance by resolving from the injector
 const warrior = injector.resolve<Warrior>(Warrior)!;
+
+expect(warrior.name).toBe('Clay');
+expect(warrior.weapon instanceof Sword).toBe(true);
+expect(warrior.drink instanceof Water).toBe(true);
+
+
+
+// you can create child injectors to handle dependencies in different scopes
+const childInjector = new Injector(injector);
+
+// register different providers for the child injector
+// all other providers will be resolved from the parent injector
+childInjector.provide(NAME_TOKEN, new ValueProvider('John'));
+
+// create an instance by resolving from the child injector
+const warrior2 = childInjector.resolve<Warrior>(Warrior)!;
+
+expect(warrior.name).toBe('John');
+expect(warrior.weapon instanceof Sword).toBe(true);
+expect(warrior.drink instanceof Water).toBe(true);
 ```

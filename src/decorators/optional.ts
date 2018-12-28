@@ -1,5 +1,5 @@
 import { getParameterAnnotation, getPropertyAnnotation } from '../annotations';
-import { Constructor } from './index';
+import { Constructor } from '../utils';
 
 export const optional = () => {
 

@@ -28,6 +28,20 @@ class Gun implements Weapon {
 }
 
 @injectable()
+class Revolver extends Gun {
+
+    constructor () {
+
+        super();
+    }
+
+    use () {
+
+        return 'Revolver shot...';
+    }
+}
+
+@injectable()
 class Water {
 
     drink () {
@@ -95,16 +109,16 @@ describe('Injector', () => {
 
     it('can be configured with different dependencies', () => {
 
-        injector.provide(WEAPON_TOKEN, new ClassProvider(Gun));
+        injector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
         injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
 
         const warrior = injector.resolve<Warrior>(Warrior)!;
 
         expect(warrior.name).toBe('Cliff');
-        expect(warrior.weapon instanceof Gun).toBe(true);
+        expect(warrior.weapon instanceof Revolver).toBe(true);
         expect(warrior.drink instanceof Water).toBe(true);
 
-        expect(warrior.fight(true)).toBe('Cliff fights: Gun shot...');
+        expect(warrior.fight(true)).toBe('Cliff fights: Revolver shot...');
         expect(warrior.fight()).toBe('Cliff fights: Fist punch...');
         expect(warrior.rest()).toBe('Cliff rests: Gulp, gulp, gulp...');
     });
@@ -134,5 +148,41 @@ describe('Injector', () => {
         expect(warrior.fight(true)).toBe('undefined fights: Sword strike...');
         expect(warrior.fight()).toBe('undefined fights: Fist punch...');
         expect(warrior.rest()).toBe('undefined rests: Gulp, gulp, gulp...');
+    });
+
+    it('can use parent injectors', () => {
+
+        // we set up the root injector
+        injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
+        injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
+
+        const warrior = injector.resolve<Warrior>(Warrior)!;
+
+        expect(warrior.name).toBe('Clay');
+        expect(warrior.weapon instanceof Sword).toBe(true);
+        expect(warrior.drink instanceof Water).toBe(true);
+
+        // we create a child injector
+        const childInjector = new Injector(injector);
+
+        const warrior2 = childInjector.resolve<Warrior>(Warrior)!;
+
+        expect(warrior2.name).toBe('Clay');
+        expect(warrior2.weapon instanceof Sword).toBe(true);
+        expect(warrior2.drink instanceof Water).toBe(true);
+
+        // we configure the child injector
+        childInjector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
+        childInjector.provide(NAME_TOKEN, new ValueProvider('John'));
+
+        const warrior3 = childInjector.resolve<Warrior>(Warrior)!;
+
+        expect(warrior3.name).toBe('John');
+        expect(warrior3.weapon instanceof Revolver).toBe(true);
+        expect(warrior3.drink instanceof Water).toBe(true);
+
+        expect(warrior3.fight(true)).toBe('John fights: Revolver shot...');
+        expect(warrior3.fight()).toBe('John fights: Fist punch...');
+        expect(warrior3.rest()).toBe('John rests: Gulp, gulp, gulp...');
     });
 });

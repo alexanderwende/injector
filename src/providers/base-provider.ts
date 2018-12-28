@@ -1,7 +1,7 @@
 import { ParameterAnnotation, PropertyAnnotation } from '../annotations';
 import { Factory } from '../factories';
 import { Injector } from '../injector';
-import { Provider } from './index';
+import { Provider } from './provider';
 
 export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with an injector.');
 
@@ -13,22 +13,24 @@ export class BaseProvider<T> implements Provider<T> {
                  public dependencies: ParameterAnnotation[]               = [],
                  public properties: { [key: string]: PropertyAnnotation } = {}) {}
 
-    provide (): T {
+    provide (injector?: Injector): T {
 
-        if (!this.injector) throw PROVIDER_UNREGISTERED;
+        if (!injector) injector = this.injector;
+
+        if (!injector) throw PROVIDER_UNREGISTERED;
 
         // console.group('Provider.provide()');
 
         // console.log('provider: ', this);
         // console.log('resolving dependencies: ', this.dependencies);
 
-        const dependencies = this._resolveDependencies();
+        const dependencies = this._resolveDependencies(injector);
 
         // console.log('resolved dependencies: ', dependencies);
 
         // console.log('resolving properties: ', this.properties);
 
-        const properties = this._resolveProperties();
+        const properties = this._resolveProperties(injector);
 
         // console.log('resolved properties: ', properties);
 
@@ -44,16 +46,16 @@ export class BaseProvider<T> implements Provider<T> {
         return (value instanceof Object) ? Object.assign(value, properties) : value;
     }
 
-    protected _resolveDependencies (): any[] {
+    protected _resolveDependencies (injector: Injector): any[] {
 
-        return this.dependencies.map(dependency => this.injector!.resolve(dependency.token, dependency.optional));
+        return this.dependencies.map(dependency => injector.resolve(dependency.token, dependency.optional));
     }
 
-    protected _resolveProperties (): { [key: string]: any } {
+    protected _resolveProperties (injector: Injector): { [key: string]: any } {
 
         return Object.entries(this.properties).reduce((result, [key, value]) => {
 
-            result[key] = this.injector!.resolve(value.token, value.optional);
+            result[key] = injector.resolve(value.token, value.optional);
 
             return result;
 

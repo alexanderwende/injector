@@ -1,4 +1,4 @@
-import { Factory } from './index';
+import { Factory } from './factory';
 
 export interface ValueFactory<T> extends Factory<T> {
     (): T;
