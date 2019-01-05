@@ -24,34 +24,27 @@ export class BaseProvider<T> implements Provider<T> {
         // console.log('provider: ', this);
         // console.log('resolving dependencies: ', this.dependencies);
 
-        const dependencies = this._resolveDependencies(injector);
+        const dependencies = this.resolveDependencies(injector);
 
         // console.log('resolved dependencies: ', dependencies);
 
         // console.log('resolving properties: ', this.properties);
 
-        const properties = this._resolveProperties(injector);
+        const properties = this.resolveProperties(injector);
 
         // console.log('resolved properties: ', properties);
 
         // console.groupEnd();
 
-        return this._createValue(dependencies, properties);
+        return this.createValue(dependencies, properties);
     }
 
-    protected _createValue (dependencies: any[], properties: { [key: string]: any }): T {
-
-        const value = this.factory(...dependencies);
-
-        return (value instanceof Object) ? Object.assign(value, properties) : value;
-    }
-
-    protected _resolveDependencies (injector: Injector): any[] {
+    resolveDependencies (injector: Injector): any[] {
 
         return this.dependencies.map(dependency => injector.resolve(dependency.token, dependency.optional));
     }
 
-    protected _resolveProperties (injector: Injector): { [key: string]: any } {
+    resolveProperties (injector: Injector): { [key: string]: any } {
 
         return Object.entries(this.properties).reduce((result, [key, value]) => {
 
@@ -60,5 +53,12 @@ export class BaseProvider<T> implements Provider<T> {
             return result;
 
         }, {} as { [key: string]: any });
+    }
+
+    createValue (dependencies: any[] = [], properties: { [key: string]: any } = {}): T {
+
+        const value = this.factory(...dependencies);
+
+        return (value instanceof Object) ? Object.assign(value, properties) : value;
     }
 }

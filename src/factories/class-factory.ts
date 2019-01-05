@@ -9,8 +9,6 @@ export const createClassFactory = <T> (constructorFn: Constructor<T>): ClassFact
 
     return (...dependencies: any[]) => {
 
-        // console.log(`ClassFactory<${constructorFn.name}>()... [dependencies]: `, dependencies);
-
-        return new constructorFn(...dependencies);
+        return Reflect.construct(constructorFn, dependencies);
     };
 };

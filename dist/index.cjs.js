@@ -139,8 +139,7 @@ const optional = () => {
 
 const createClassFactory = (constructorFn) => {
     return (...dependencies) => {
-        // console.log(`ClassFactory<${constructorFn.name}>()... [dependencies]: `, dependencies);
-        return new constructorFn(...dependencies);
+        return Reflect.construct(constructorFn, dependencies);
     };
 };
 
@@ -148,7 +147,7 @@ const createSingletonFactory = (constructorFn) => {
     let instance;
     return (...dependencies) => {
         if (!instance)
-            instance = new constructorFn(...dependencies);
+            instance = Reflect.construct(constructorFn, dependencies);
         return instance;
     };
 };
@@ -172,26 +171,26 @@ class BaseProvider {
         // console.group('Provider.provide()');
         // console.log('provider: ', this);
         // console.log('resolving dependencies: ', this.dependencies);
-        const dependencies = this._resolveDependencies(injector);
+        const dependencies = this.resolveDependencies(injector);
         // console.log('resolved dependencies: ', dependencies);
         // console.log('resolving properties: ', this.properties);
-        const properties = this._resolveProperties(injector);
+        const properties = this.resolveProperties(injector);
         // console.log('resolved properties: ', properties);
         // console.groupEnd();
-        return this._createValue(dependencies, properties);
+        return this.createValue(dependencies, properties);
     }
-    _createValue(dependencies, properties) {
-        const value = this.factory(...dependencies);
-        return (value instanceof Object) ? Object.assign(value, properties) : value;
-    }
-    _resolveDependencies(injector) {
+    resolveDependencies(injector) {
         return this.dependencies.map(dependency => injector.resolve(dependency.token, dependency.optional));
     }
-    _resolveProperties(injector) {
+    resolveProperties(injector) {
         return Object.entries(this.properties).reduce((result, [key, value]) => {
             result[key] = injector.resolve(value.token, value.optional);
             return result;
         }, {});
+    }
+    createValue(dependencies = [], properties = {}) {
+        const value = this.factory(...dependencies);
+        return (value instanceof Object) ? Object.assign(value, properties) : value;
     }
 }
 

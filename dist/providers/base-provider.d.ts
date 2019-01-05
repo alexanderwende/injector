@@ -14,11 +14,11 @@ export declare class BaseProvider<T> implements Provider<T> {
         [key: string]: PropertyAnnotation;
     });
     provide(injector?: Injector): T;
-    protected _createValue(dependencies: any[], properties: {
-        [key: string]: any;
-    }): T;
-    protected _resolveDependencies(injector: Injector): any[];
-    protected _resolveProperties(injector: Injector): {
+    resolveDependencies(injector: Injector): any[];
+    resolveProperties(injector: Injector): {
         [key: string]: any;
     };
+    createValue(dependencies?: any[], properties?: {
+        [key: string]: any;
+    }): T;
 }

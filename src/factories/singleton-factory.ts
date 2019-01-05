@@ -11,7 +11,7 @@ export const createSingletonFactory = <T> (constructorFn: Constructor<T>): Singl
 
     return (...dependencies: any[]) => {
 
-        if (!instance) instance = new constructorFn(...dependencies);
+        if (!instance) instance = Reflect.construct(constructorFn, dependencies);
 
         return instance;
     };
