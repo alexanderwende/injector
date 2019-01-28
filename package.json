@@ -11,33 +11,56 @@
     "decorator",
     "injector"
   ],
-  "types": "dist/index.d.ts",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
+  "types": "lib/index.d.ts",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "files": [
+    "/lib/",
+    "/src/"
+  ],
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "rollup -c",
-    "build:watch": "rollup -c -w",
-    "test": "karma start karma.config.js"
+    "pretest": "rimraf dev coverage",
+    "test": "tsc -p tsconfig.dev.json && karma start karma.config.js",
+    "test:watch": "tsc -w -p tsconfig.dev.json & karma start karma.config.js --auto-watch --no-single-run",
+    "release": "release-it --no-npm.publish",
+    "changelog": "auto-changelog -p --stdout",
+    "beforeStage": "auto-changelog -p"
   },
   "author": "Alexander Wende",
-  "license": "MIT",
+  "license": "BSD-3-Clause",
   "devDependencies": {
-    "@types/jasmine": "^3.3.4",
+    "@abraham/reflection": "^0.5.0",
+    "@types/jasmine": "^3.3.8",
+    "auto-changelog": "^1.11.0",
     "jasmine-core": "^3.3.0",
-    "karma": "^3.1.4",
+    "karma": "^4.0.0",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-coverage": "^1.1.2",
     "karma-jasmine": "^2.0.1",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-typescript": "^3.0.13",
-    "reflect-metadata": "^0.1.12",
-    "rollup": "^0.68.2",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-typescript2": "^0.18.1",
-    "tslint": "^5.12.0",
+    "karma-remap-coverage": "^0.1.5",
+    "karma-rollup-preprocessor": "^7.0.0-rc.2",
+    "reflect-metadata": "^0.1.13",
+    "release-it": "^10.0.4",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.1.2",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-filesize": "^6.0.1",
+    "rollup-plugin-istanbul": "^2.0.1",
+    "rollup-plugin-local-resolve": "^1.0.7",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-terser": "^4.0.3",
+    "rollup-plugin-typescript2": "^0.19.2",
+    "tslint": "^5.12.1",
     "tslint-clean-code": "^0.2.9",
-    "typescript": "^3.2.2"
+    "typescript": "^3.2.4"
   },
   "peerDependencies": {
-    "reflect-metadata": "^0.1.12"
+    "reflect-metadata": "^0.1.13"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

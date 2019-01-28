@@ -1,6 +1,9 @@
-.rpt2_cache
-coverage
-node_modules
+/coverage/
+/dev/
+/node_modules/
+
+# Optional rollup-plugin-typescript2 cache directory
+/.rpt2_cache/
 
 # Optional npm cache directory
 .npm

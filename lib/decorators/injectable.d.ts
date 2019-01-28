@@ -1,0 +1,3 @@
+import { Constructor } from '../utils';
+export declare const injectable: () => (target: Constructor<object>) => void;
+//# sourceMappingURL=injectable.d.ts.map

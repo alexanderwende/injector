@@ -1,0 +1,1 @@
+{"version":3,"file":"inject-token.d.ts","sourceRoot":"","sources":["src/inject-token.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAA2B,MAAM,SAAS,CAAC;AAE/D,qBAAa,WAAW,CAAC,CAAC,GAAG,GAAG;IAE5B,WAAW,EAAE,MAAM,CAAC;IAEpB,KAAK,EAAE,MAAM,CAAC;gBAED,KAAK,EAAE,WAAW,CAAC,CAAC,CAAC,GAAG,MAAM,GAAG,MAAM;CAkBvD"}

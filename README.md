@@ -4,7 +4,7 @@ A lightweight dependency injection container.
 
 ## Usage
 
-```
+```ts
 interface Weapon {
 
     use (): string;

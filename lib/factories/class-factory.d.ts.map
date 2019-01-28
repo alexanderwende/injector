@@ -1,0 +1,1 @@
+{"version":3,"file":"class-factory.d.ts","sourceRoot":"","sources":["../src/factories/class-factory.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,UAAU,CAAC;AACvC,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAEpC,MAAM,WAAW,YAAY,CAAC,CAAC,CAAE,SAAQ,OAAO,CAAC,CAAC,CAAC;IAC/C,CAAC,GAAG,YAAY,EAAE,GAAG,EAAE,GAAG,CAAC,CAAC;CAC/B;AAED,eAAO,MAAM,kBAAkB,uDAM9B,CAAC"}
