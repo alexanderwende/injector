@@ -3,8 +3,8 @@ import { InjectToken } from './inject-token';
 import { ClassProvider, Provider } from './providers';
 import { Constructor } from './utils';
 
-export const CLASS_NOT_INJECTABLE = (constructorFn: Constructor) => new Error(`Class '${constructorFn.name}' has not been decorated as injectable and cannot be resolved.`);
-export const NO_PROVIDER          = (token: InjectToken) => new Error(`No provider has been found for the requested token '${token.description}'.`);
+export const CLASS_NOT_PROVIDABLE = (constructorFn: Constructor) => new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be resolved.`);
+export const NO_PROVIDER          = (token: InjectToken) => new Error(`No provider has been found for the requested token '${ token.description }'.`);
 
 export class Injector {
 
@@ -19,12 +19,12 @@ export class Injector {
 
     provide<T> (constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>) {
 
-        const token: InjectToken<T> = constructorOrToken instanceof InjectToken ?
-                                      constructorOrToken :
-                                      getTokenAnnotation(constructorOrToken);
+        const token: InjectToken<T> | undefined = constructorOrToken instanceof InjectToken ?
+                                                  constructorOrToken :
+                                                  getTokenAnnotation(constructorOrToken);
 
         // class was not decorated with @injectable, throw
-        if (!token) throw CLASS_NOT_INJECTABLE(constructorOrToken as Constructor);
+        if (!token) throw CLASS_NOT_PROVIDABLE(constructorOrToken as Constructor);
 
         provider.injector = this;
 
@@ -55,10 +55,10 @@ export class Injector {
 
     protected _resolveConstructor<T> (constructorFn: Constructor<T>, optional = false): T | undefined {
 
-        const token: InjectToken<T> = getTokenAnnotation(constructorFn);
+        const token: InjectToken<T> | undefined = getTokenAnnotation(constructorFn);
 
         // class was not decorated with @injectable, throw
-        if (!token) throw CLASS_NOT_INJECTABLE(constructorFn);
+        if (!token) throw CLASS_NOT_PROVIDABLE(constructorFn);
 
         // class has no provider yet, we create one
         if (!this._getProvider(token)) {

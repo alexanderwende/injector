@@ -1,3 +1,6 @@
+// TODO: Replace when fixed: https://github.com/abraham/reflection/issues/89
+// import '@abraham/reflection';
+import 'reflect-metadata';
 import { InjectToken } from '../inject-token';
 import { Constructor } from '../utils';
 import * as ANNOTATION from './metadata-keys';
@@ -14,7 +17,7 @@ export interface PropertyAnnotation<T = any> {
     optional: boolean;
 }
 
-export const getTokenAnnotation = <T> (target: Constructor<T>): InjectToken<T> => {
+export const getTokenAnnotation = <T> (target: Constructor<T>): InjectToken<T> | undefined => {
 
     return Reflect.getOwnMetadata(ANNOTATION.TOKEN, target);
 };
@@ -28,14 +31,14 @@ export const getParameterAnnotation = (target: Constructor, parameterIndex: numb
 
     ensureParameterAnnotations(target);
 
-    return Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target)[parameterIndex];
+    return (Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target) as ParameterAnnotation[])[parameterIndex];
 };
 
 export const getParameterAnnotations = (target: Constructor): ParameterAnnotation[] => {
 
     ensureParameterAnnotations(target);
 
-    return Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target);
+    return Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target) as ParameterAnnotation[];
 };
 
 export const ensureParameterAnnotations = (target: Constructor) => {
@@ -53,14 +56,14 @@ export const getPropertyAnnotation = (target: Constructor, propertyKey: string):
 
     ensurePropertyAnnotation(target, propertyKey);
 
-    return Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target)[propertyKey];
+    return (Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target) as { [key: string]: PropertyAnnotation })[propertyKey];
 };
 
 export const getPropertyAnnotations = (target: Constructor): { [key: string]: PropertyAnnotation } => {
 
     ensurePropertyAnnotations(target);
 
-    return Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target);
+    return Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target) as { [key: string]: PropertyAnnotation };
 };
 
 export const ensurePropertyAnnotations = (target: Constructor) => {
@@ -73,13 +76,13 @@ export const ensurePropertyAnnotations = (target: Constructor) => {
 
 export const ensurePropertyAnnotation = (target: Constructor, propertyKey: string) => {
 
-    ensurePropertyAnnotations(target);
-
-    const properties: { [key: string]: PropertyAnnotation } = Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target);
+    const properties = getPropertyAnnotations(target);
 
     if (!properties.hasOwnProperty(propertyKey)) {
 
-        properties[propertyKey] = createPropertyAnnotation(Reflect.getOwnMetadata(ANNOTATION.DESIGN_TYPE, target.prototype, propertyKey));
+        const propertyType: InjectToken | Constructor = Reflect.getOwnMetadata(ANNOTATION.DESIGN_TYPE, target.prototype, propertyKey) as InjectToken | Constructor;
+
+        properties[propertyKey] = createPropertyAnnotation(propertyType);
     }
 };
 

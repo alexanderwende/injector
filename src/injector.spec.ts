@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { inject, injectable, optional } from './decorators';
 import { InjectToken } from './inject-token';
 import { Injector, NO_PROVIDER } from './injector';
