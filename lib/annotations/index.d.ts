@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { InjectToken } from '../inject-token';
 import { Constructor } from '../utils';
 import * as ANNOTATION from './metadata-keys';

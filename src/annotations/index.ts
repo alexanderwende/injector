@@ -1,6 +1,4 @@
-// TODO: Replace when fixed: https://github.com/abraham/reflection/issues/89
-// import '@abraham/reflection';
-import 'reflect-metadata';
+import '@abraham/reflection';
 import { InjectToken } from '../inject-token';
 import { Constructor } from '../utils';
 import * as ANNOTATION from './metadata-keys';

@@ -2,6 +2,10 @@
 
 A lightweight dependency injection container.
 
+- Minified Size:  3.9 KB
+- Gzipped Size:  1.46 KB
+- Brotli size: 1.29 KB
+
 ## Usage
 
 ```ts
