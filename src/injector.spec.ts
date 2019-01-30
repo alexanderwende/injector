@@ -1,7 +1,7 @@
 import { inject, injectable, optional } from './decorators';
 import { InjectToken } from './inject-token';
 import { Injector, NO_PROVIDER } from './injector';
-import { ClassProvider, ValueProvider } from './providers';
+import { ClassProvider, ValueProvider, SingletonProvider } from './providers';
 
 interface Weapon {
 
@@ -104,6 +104,16 @@ describe('Injector', () => {
         expect(warrior.fight(true)).toBe('Clay fights: Sword strike...');
         expect(warrior.fight()).toBe('Clay fights: Fist punch...');
         expect(warrior.rest()).toBe('Clay rests: Gulp, gulp, gulp...');
+
+        const warrior2 = injector.resolve<Warrior>(Warrior)!;
+
+        expect(warrior2.name).toBe('Clay');
+        expect(warrior2.weapon instanceof Sword).toBe(true);
+        expect(warrior2.drink instanceof Water).toBe(true);
+
+        // instances of Sword and Water should be distinct
+        expect(warrior.weapon).not.toBe(warrior2.weapon);
+        expect(warrior.drink).not.toBe(warrior2.drink);
     });
 
     it('can be configured with different dependencies', () => {
@@ -120,6 +130,27 @@ describe('Injector', () => {
         expect(warrior.fight(true)).toBe('Cliff fights: Revolver shot...');
         expect(warrior.fight()).toBe('Cliff fights: Fist punch...');
         expect(warrior.rest()).toBe('Cliff rests: Gulp, gulp, gulp...');
+    });
+
+    it('resolves singleton dependencies correctly', () => {
+
+        injector.provide(WEAPON_TOKEN, new SingletonProvider(Gun));
+        injector.provide(NAME_TOKEN, new ValueProvider('Smith'));
+
+        const warrior = injector.resolve<Warrior>(Warrior)!;
+
+        expect(warrior.name).toBe('Smith');
+        expect(warrior.weapon instanceof Gun).toBe(true);
+        expect(warrior.drink instanceof Water).toBe(true);
+
+        const warrior2 = injector.resolve<Warrior>(Warrior)!;
+
+        expect(warrior2.name).toBe('Smith');
+        expect(warrior2.weapon instanceof Gun).toBe(true);
+        expect(warrior2.drink instanceof Water).toBe(true);
+
+        // instances of Gun should be the same
+        expect(warrior.weapon).toBe(warrior2.weapon);
     });
 
     it('throws exception on missing dependencies', () => {
