@@ -1,6 +1,12 @@
 language: node_js
+
 node_js:
   - "node"
-  - "10.15.1"
+  - "lts/*"
 
 cache: npm
+
+git:
+  depth: 1
+
+script: npm run test:ci

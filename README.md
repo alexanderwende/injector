@@ -1,6 +1,9 @@
 # Injector
 
-A lightweight dependency injection container.
+A lightweight reflective dependency injection container.
+
+[![Build Status](https://travis-ci.org/alexanderwende/injector.svg?branch=master)](https://travis-ci.org/alexanderwende/injector)
+[![Coverage Status](https://coveralls.io/repos/github/alexanderwende/injector/badge.svg?branch=master)](https://coveralls.io/github/alexanderwende/injector?branch=master)
 
 - Minified Size:  3.9 KB
 - Gzipped Size:  1.46 KB
