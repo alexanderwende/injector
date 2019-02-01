@@ -19,12 +19,15 @@
     "/src/"
   ],
   "scripts": {
-    "prebuild": "rimraf lib",
+    "prebuild": "rimraf ./lib",
     "build": "rollup -c",
-    "pretest": "rimraf dev coverage",
+    "postbuild": "npm run docs",
+    "pretest": "rimraf ./dev ./coverage",
     "test": "tsc -p tsconfig.dev.json && karma start karma.config.js",
     "test:ci": "tsc -p tsconfig.dev.json && karma start karma.config.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "test:watch": "tsc -w -p tsconfig.dev.json & karma start karma.config.js --auto-watch --no-single-run",
+    "predocs": "rimraf ./docs",
+    "docs": "api-extractor run && api-documenter markdown --input-folder ./docs --output-folder ./docs",
     "release": "release-it --no-npm.publish",
     "changelog": "auto-changelog -p --stdout",
     "beforeStage": "auto-changelog -p"
@@ -33,6 +36,8 @@
   "license": "BSD-3-Clause",
   "devDependencies": {
     "@abraham/reflection": "^0.5.1",
+    "@microsoft/api-documenter": "^1.5.59",
+    "@microsoft/api-extractor": "^6.3.0",
     "@types/jasmine": "^3.3.8",
     "auto-changelog": "^1.11.0",
     "coveralls": "^3.0.2",

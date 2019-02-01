@@ -2,6 +2,9 @@ import { ParameterAnnotation, PropertyAnnotation } from '../annotations';
 import { Factory } from '../factories';
 import { Injector } from '../injector';
 import { Provider } from './provider';
+/**
+ * @internal
+ */
 export declare const PROVIDER_UNREGISTERED: Error;
 export declare class BaseProvider<T> implements Provider<T> {
     factory: Factory<T>;

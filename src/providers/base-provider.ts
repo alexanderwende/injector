@@ -3,6 +3,9 @@ import { Factory } from '../factories';
 import { Injector } from '../injector';
 import { Provider } from './provider';
 
+/**
+ * @internal
+ */
 export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with an injector.');
 
 export class BaseProvider<T> implements Provider<T> {

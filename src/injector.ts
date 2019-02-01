@@ -3,7 +3,14 @@ import { InjectToken } from './inject-token';
 import { ClassProvider, Provider } from './providers';
 import { Constructor } from './utils';
 
+/**
+ * @internal
+ */
 export const CLASS_NOT_PROVIDABLE = (constructorFn: Constructor) => new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be resolved.`);
+
+/**
+ * @internal
+ */
 export const NO_PROVIDER          = (token: InjectToken) => new Error(`No provider has been found for the requested token '${ token.description }'.`);
 
 export class Injector {
@@ -12,11 +19,33 @@ export class Injector {
 
     private _parent: Injector | null = null;
 
+    /**
+     * Creates an injector instance.
+     *
+     * @remarks
+     * A child injector can be created by passing the parent injector as a constructor argument.
+     * ```typescript
+     * const rootInjector = new Injector();
+     * const childInjector = new Injector(rootInjector);
+     * ```
+     *
+     * @param parent - A parent injector
+     *
+     * @public
+     */
     constructor (parent?: Injector) {
 
         if (parent) this._parent = parent;
     }
 
+    /**
+     * Provide a provider for a dependency to the injector
+     *
+     * @param constructorOrToken - A class constructor or {@link InjectToken} to provide
+     * @param provider - A {@link Provider} which will be used to resolve the class or token
+     *
+     * @public
+     */
     provide<T> (constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>) {
 
         const token: InjectToken<T> | undefined = constructorOrToken instanceof InjectToken ?
@@ -31,6 +60,14 @@ export class Injector {
         this._registry.set(token, provider);
     }
 
+    /**
+     * Resolve a dependency
+     *
+     * @param target - A class constructor or {@link InjectToken} to resolve
+     * @param optional - Should the dependency be optional. If `true` the injector will not throw an error if it cannot resolve the dependency and returns `undefined`. If `false` the injector will throw an error if the dependency cannot be resolved.
+     *
+     * @public
+     */
     resolve<T> (target: Constructor<T> | InjectToken<T>, optional = false): T | undefined {
 
         let resolved: T | undefined;
@@ -53,6 +90,9 @@ export class Injector {
         return resolved;
     }
 
+    /**
+     * @internal
+     */
     protected _resolveConstructor<T> (constructorFn: Constructor<T>, optional = false): T | undefined {
 
         const token: InjectToken<T> | undefined = getTokenAnnotation(constructorFn);
@@ -69,6 +109,9 @@ export class Injector {
         return this._resolveToken(token, optional);
     }
 
+    /**
+     * @internal
+     */
     protected _resolveToken<T> (token: InjectToken<T>, optional = false): T | undefined {
 
         const provider = this._getProvider(token);
@@ -83,6 +126,9 @@ export class Injector {
         return provider!.provide(this);
     }
 
+    /**
+     * @internal
+     */
     protected _getProvider<T> (token: InjectToken<T>): Provider<T> | undefined {
 
         if (this._registry.has(token)) {

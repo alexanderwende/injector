@@ -2,6 +2,9 @@ import { getParameterAnnotation, getPropertyAnnotation, getTokenAnnotation } fro
 import { InjectToken } from '../inject-token';
 import { Constructor } from '../utils';
 
+/**
+ * @internal
+ */
 export const CLASS_NOT_INJECTABLE = (constructorFn: Constructor) => new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be injected.`);
 
 export const inject = <T> (constructorOrToken?: Constructor<T> | InjectToken<T>) => {
