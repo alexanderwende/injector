@@ -5,9 +5,10 @@ import { BaseProvider } from './base-provider';
 
 export class ClassProvider<T> extends BaseProvider<T> {
 
-    constructor (constructorFn: Constructor<T>,
-                 dependencies?: ParameterAnnotation[],
-                 properties?: { [key: string]: PropertyAnnotation }) {
+    constructor (
+        constructorFn: Constructor<T>,
+        dependencies?: ParameterAnnotation[],
+        properties?: { [key: string]: PropertyAnnotation }) {
 
         super(
             createClassFactory(constructorFn),

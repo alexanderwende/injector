@@ -8,7 +8,7 @@
 |  --- | --- |
 |  [`BaseProvider`](./injector.baseprovider.md) |  |
 |  [`ClassProvider`](./injector.classprovider.md) |  |
-|  [`Injector`](./injector.injector.md) |  |
+|  [`Injector`](./injector.injector.md) | The injector class |
 |  [`InjectToken`](./injector.injecttoken.md) |  |
 |  [`SingletonProvider`](./injector.singletonprovider.md) |  |
 |  [`ValueProvider`](./injector.valueprovider.md) |  |

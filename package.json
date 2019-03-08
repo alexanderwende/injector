@@ -11,15 +11,15 @@
     "decorator",
     "injector"
   ],
-  "types": "lib/index.d.ts",
-  "main": "lib/index.cjs.js",
-  "module": "lib/index.esm.js",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
   "files": [
-    "/lib/",
+    "/dist/",
     "/src/"
   ],
   "scripts": {
-    "prebuild": "rimraf ./lib",
+    "prebuild": "rimraf ./dist",
     "build": "rollup -c",
     "postbuild": "npm run docs",
     "pretest": "rimraf ./dev ./coverage",
@@ -42,7 +42,7 @@
     "auto-changelog": "^1.11.0",
     "coveralls": "^3.0.2",
     "jasmine-core": "^3.3.0",
-    "karma": "^4.0.0",
+    "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
     "karma-jasmine": "^2.0.1",
@@ -58,7 +58,7 @@
     "rollup-plugin-local-resolve": "^1.0.7",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-terser": "^4.0.3",
-    "rollup-plugin-typescript2": "^0.19.2",
+    "rollup-plugin-typescript2": "^0.19.3",
     "tslint": "^5.12.1",
     "tslint-clean-code": "^0.2.9",
     "typescript": "^3.2.4"

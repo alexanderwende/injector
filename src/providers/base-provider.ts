@@ -12,9 +12,10 @@ export class BaseProvider<T> implements Provider<T> {
 
     public injector: Injector | undefined;
 
-    constructor (public factory: Factory<T>,
-                 public dependencies: ParameterAnnotation[]               = [],
-                 public properties: { [key: string]: PropertyAnnotation } = {}) {}
+    constructor (
+        public factory: Factory<T>,
+        public dependencies: ParameterAnnotation[] = [],
+        public properties: { [key: string]: PropertyAnnotation } = {}) { }
 
     provide (injector?: Injector): T {
 
@@ -22,22 +23,9 @@ export class BaseProvider<T> implements Provider<T> {
 
         if (!injector) throw PROVIDER_UNREGISTERED;
 
-        // console.group('Provider.provide()');
-
-        // console.log('provider: ', this);
-        // console.log('resolving dependencies: ', this.dependencies);
-
         const dependencies = this.resolveDependencies(injector);
 
-        // console.log('resolved dependencies: ', dependencies);
-
-        // console.log('resolving properties: ', this.properties);
-
         const properties = this.resolveProperties(injector);
-
-        // console.log('resolved properties: ', properties);
-
-        // console.groupEnd();
 
         return this.createValue(dependencies, properties);
     }

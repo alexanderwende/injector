@@ -13,13 +13,13 @@ export const inject = <T> (constructorOrToken?: Constructor<T> | InjectToken<T>)
 
         const isParameterDecorator = typeof parameterIndex === 'number';
 
-        const token: Constructor<T> | InjectToken<T> | undefined = (constructorOrToken instanceof InjectToken) ?
-                                                                   constructorOrToken :
-                                                                   (constructorOrToken instanceof Function) ?
-                                                                   getTokenAnnotation(constructorOrToken) :
-                                                                   (isParameterDecorator) ?
-                                                                   getParameterAnnotation(target as Constructor, parameterIndex!).token :
-                                                                   getPropertyAnnotation(target.constructor as Constructor, propertyKey as string).token;
+        const token: Constructor<T> | InjectToken<T> | undefined = (constructorOrToken instanceof InjectToken)
+            ? constructorOrToken
+            : (constructorOrToken instanceof Function)
+                ? getTokenAnnotation(constructorOrToken)
+                : (isParameterDecorator)
+                    ? getParameterAnnotation(target as Constructor, parameterIndex!).token
+                    : getPropertyAnnotation(target.constructor as Constructor, propertyKey as string).token;
 
         // token can only be undefined, when injecting a class type
         if (!token) {
@@ -34,16 +34,12 @@ export const inject = <T> (constructorOrToken?: Constructor<T> | InjectToken<T>)
 
             parameterAnnotation.token = token;
 
-            // console.log('inject()... ', parameterAnnotation);
-
         } else {
 
             // decorator is a property decorator
             const propertyAnnotation = getPropertyAnnotation(target.constructor as Constructor, propertyKey as string);
 
             propertyAnnotation.token = token;
-
-            // console.log('inject()... ', propertyAnnotation);
         }
     };
 };

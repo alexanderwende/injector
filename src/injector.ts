@@ -11,8 +11,11 @@ export const CLASS_NOT_PROVIDABLE = (constructorFn: Constructor) => new Error(`C
 /**
  * @internal
  */
-export const NO_PROVIDER          = (token: InjectToken) => new Error(`No provider has been found for the requested token '${ token.description }'.`);
+export const NO_PROVIDER = (token: InjectToken) => new Error(`No provider has been found for the requested token '${ token.description }'.`);
 
+/**
+ * The injector class
+ */
 export class Injector {
 
     private _registry: Map<InjectToken<any>, Provider<any>> = new Map();
@@ -24,14 +27,13 @@ export class Injector {
      *
      * @remarks
      * A child injector can be created by passing the parent injector as a constructor argument.
+     *
      * ```typescript
      * const rootInjector = new Injector();
      * const childInjector = new Injector(rootInjector);
      * ```
      *
      * @param parent - A parent injector
-     *
-     * @public
      */
     constructor (parent?: Injector) {
 
@@ -43,14 +45,12 @@ export class Injector {
      *
      * @param constructorOrToken - A class constructor or {@link InjectToken} to provide
      * @param provider - A {@link Provider} which will be used to resolve the class or token
-     *
-     * @public
      */
     provide<T> (constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>) {
 
-        const token: InjectToken<T> | undefined = constructorOrToken instanceof InjectToken ?
-                                                  constructorOrToken :
-                                                  getTokenAnnotation(constructorOrToken);
+        const token: InjectToken<T> | undefined = constructorOrToken instanceof InjectToken
+            ? constructorOrToken
+            : getTokenAnnotation(constructorOrToken);
 
         // class was not decorated with @injectable, throw
         if (!token) throw CLASS_NOT_PROVIDABLE(constructorOrToken as Constructor);
@@ -65,27 +65,19 @@ export class Injector {
      *
      * @param target - A class constructor or {@link InjectToken} to resolve
      * @param optional - Should the dependency be optional. If `true` the injector will not throw an error if it cannot resolve the dependency and returns `undefined`. If `false` the injector will throw an error if the dependency cannot be resolved.
-     *
-     * @public
      */
     resolve<T> (target: Constructor<T> | InjectToken<T>, optional = false): T | undefined {
 
         let resolved: T | undefined;
 
-        // console.group('Injector.resolve()');
-
         if (target instanceof InjectToken) {
 
-            // console.log('resolving: ', target.value);
             resolved = this._resolveToken(target, optional);
 
         } else {
 
-            // console.log('resolving: ', target.name);
             resolved = this._resolveConstructor(target, optional);
         }
-
-        // console.groupEnd();
 
         return resolved;
     }

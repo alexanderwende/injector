@@ -2,6 +2,8 @@
 
 # Injector class
 
+The injector class
+
 ## Methods
 
 |  Method | Access Modifier | Returns | Description |

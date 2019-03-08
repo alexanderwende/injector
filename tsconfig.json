@@ -10,7 +10,7 @@
     "declarationMap": true,
     "removeComments": false,
     "sourceMap": true,
-    "outDir": "lib",
+    "outDir": "dist",
     "strict": true,
     "moduleResolution": "node",
     "baseUrl": "./",
