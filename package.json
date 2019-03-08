@@ -1,6 +1,6 @@
 {
   "name": "injector",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Dependency Injection Container",
   "keywords": [
     "dependency injection",
