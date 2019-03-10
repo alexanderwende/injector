@@ -84,18 +84,38 @@ describe('Injector', () => {
         injector = new Injector();
     });
 
-    it('creates an injector', () => {
+    it('should create an injector', () => {
 
         expect(injector).toBeDefined();
         expect(injector instanceof Injector).toBe(true);
     });
 
-    it('resolves dependencies correctly', () => {
+    it('should resolve classes', () => {
+
+        expect(injector.resolve(Sword)! instanceof Sword).toBe(true);
+        expect(injector.resolve(Sword)!.use()).toBe('Sword strike...');
+
+        expect(injector.resolve(Water)! instanceof Water).toBe(true);
+        expect(injector.resolve(Water)!.drink()).toBe('Gulp, gulp, gulp...');
+    });
+
+    it('should resolve tokens', () => {
 
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
         injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
 
-        const warrior = injector.resolve<Warrior>(Warrior)!;
+        expect(injector.resolve(WEAPON_TOKEN)! instanceof Sword).toBe(true);
+        expect(injector.resolve(WEAPON_TOKEN)!.use()).toBe('Sword strike...');
+
+        expect(injector.resolve(NAME_TOKEN)!).toBe('Clay');
+    });
+
+    it('should resolve dependencies correctly', () => {
+
+        injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
+        injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
+
+        const warrior = injector.resolve(Warrior)!;
 
         expect(warrior.name).toBe('Clay');
         expect(warrior.weapon instanceof Sword).toBe(true);
@@ -105,7 +125,7 @@ describe('Injector', () => {
         expect(warrior.fight()).toBe('Clay fights: Fist punch...');
         expect(warrior.rest()).toBe('Clay rests: Gulp, gulp, gulp...');
 
-        const warrior2 = injector.resolve<Warrior>(Warrior)!;
+        const warrior2 = injector.resolve(Warrior)!;
 
         expect(warrior2.name).toBe('Clay');
         expect(warrior2.weapon instanceof Sword).toBe(true);
@@ -121,7 +141,7 @@ describe('Injector', () => {
         injector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
         injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
 
-        const warrior = injector.resolve<Warrior>(Warrior)!;
+        const warrior = injector.resolve(Warrior)!;
 
         expect(warrior.name).toBe('Cliff');
         expect(warrior.weapon instanceof Revolver).toBe(true);
@@ -132,18 +152,18 @@ describe('Injector', () => {
         expect(warrior.rest()).toBe('Cliff rests: Gulp, gulp, gulp...');
     });
 
-    it('resolves singleton dependencies correctly', () => {
+    it('should resolve singleton dependencies correctly', () => {
 
         injector.provide(WEAPON_TOKEN, new SingletonProvider(Gun));
         injector.provide(NAME_TOKEN, new ValueProvider('Smith'));
 
-        const warrior = injector.resolve<Warrior>(Warrior)!;
+        const warrior = injector.resolve(Warrior)!;
 
         expect(warrior.name).toBe('Smith');
         expect(warrior.weapon instanceof Gun).toBe(true);
         expect(warrior.drink instanceof Water).toBe(true);
 
-        const warrior2 = injector.resolve<Warrior>(Warrior)!;
+        const warrior2 = injector.resolve(Warrior)!;
 
         expect(warrior2.name).toBe('Smith');
         expect(warrior2.weapon instanceof Gun).toBe(true);
@@ -153,23 +173,23 @@ describe('Injector', () => {
         expect(warrior.weapon).toBe(warrior2.weapon);
     });
 
-    it('throws exception on missing dependencies', () => {
+    it('should throw exception on missing dependencies', () => {
 
         injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
 
         const resolve = () => {
 
-            injector.resolve<Warrior>(Warrior);
+            injector.resolve(Warrior);
         };
 
         expect(resolve).toThrowError(NO_PROVIDER(WEAPON_TOKEN).message);
     });
 
-    it('passes undefined for optional missing dependency', () => {
+    it('should pass undefined for optional missing dependency', () => {
 
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
 
-        const warrior = injector.resolve<Warrior>(Warrior)!;
+        const warrior = injector.resolve(Warrior)!;
 
         expect(warrior.name).toBeUndefined();
         expect(warrior.weapon instanceof Sword).toBe(true);
@@ -186,7 +206,7 @@ describe('Injector', () => {
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
         injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
 
-        const warrior = injector.resolve<Warrior>(Warrior)!;
+        const warrior = injector.resolve(Warrior)!;
 
         expect(warrior.name).toBe('Clay');
         expect(warrior.weapon instanceof Sword).toBe(true);
@@ -195,7 +215,7 @@ describe('Injector', () => {
         // we create a child injector
         const childInjector = new Injector(injector);
 
-        const warrior2 = childInjector.resolve<Warrior>(Warrior)!;
+        const warrior2 = childInjector.resolve(Warrior)!;
 
         expect(warrior2.name).toBe('Clay');
         expect(warrior2.weapon instanceof Sword).toBe(true);
@@ -205,7 +225,7 @@ describe('Injector', () => {
         childInjector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
         childInjector.provide(NAME_TOKEN, new ValueProvider('John'));
 
-        const warrior3 = childInjector.resolve<Warrior>(Warrior)!;
+        const warrior3 = childInjector.resolve(Warrior)!;
 
         expect(warrior3.name).toBe('John');
         expect(warrior3.weapon instanceof Revolver).toBe(true);
