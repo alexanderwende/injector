@@ -6,6 +6,10 @@
       "es2017",
       "dom"
     ],
+    "types": [
+      "@abraham/reflection",
+      "@types/jasmine"
+    ],
     "declaration": true,
     "declarationMap": true,
     "removeComments": false,

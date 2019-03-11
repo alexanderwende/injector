@@ -1,96 +1,93 @@
 import { inject, injectable, optional } from './decorators';
 import { InjectToken } from './inject-token';
 import { Injector, NO_PROVIDER } from './injector';
-import { ClassProvider, ValueProvider, SingletonProvider } from './providers';
-
-interface Weapon {
-
-    use (): string;
-}
-
-@injectable()
-class Sword implements Weapon {
-
-    use () {
-
-        return 'Sword strike...';
-    }
-}
-
-@injectable()
-class Gun implements Weapon {
-
-    use () {
-
-        return 'Gun shot...';
-    }
-}
-
-@injectable()
-class Revolver extends Gun {
-
-    constructor () {
-
-        super();
-    }
-
-    use () {
-
-        return 'Revolver shot...';
-    }
-}
-
-@injectable()
-class Water {
-
-    drink () {
-
-        return 'Gulp, gulp, gulp...';
-    };
-}
-
-// interfaces disappear after compilation, so we need to create an InjectToken
-// for the interface if we want to use it in the injector
-const WEAPON_TOKEN = new InjectToken<Weapon>('Weapon');
-
-// we can also create tokens for arbitrary values
-const NAME_TOKEN = new InjectToken<string>('NAME');
-
-@injectable()
-class Warrior {
-
-    @optional() @inject(NAME_TOKEN)
-    public name!: string;
-
-    constructor (@inject(WEAPON_TOKEN) public weapon: Weapon, public drink?: Water) {}
-
-    fight (useWeapon: boolean = false) {
-
-        return `${this.name} fights: ${useWeapon ? this.weapon.use() : 'Fist punch...'}`;
-    }
-
-    rest () {
-
-        return `${this.name} rests: ${this.drink ? this.drink.drink() : ''}`;
-    }
-}
+import { ClassProvider, SingletonProvider, ValueProvider } from './providers';
 
 describe('Injector', () => {
 
-    let injector: Injector;
+    interface Weapon {
 
-    beforeEach(() => {
+        use (): string;
+    }
 
-        injector = new Injector();
-    });
+    @injectable()
+    class Sword implements Weapon {
+
+        use () {
+
+            return 'Sword strike...';
+        }
+    }
+
+    @injectable()
+    class Gun implements Weapon {
+
+        use () {
+
+            return 'Gun shot...';
+        }
+    }
+
+    @injectable()
+    class Revolver extends Gun {
+
+        constructor () {
+
+            super();
+        }
+
+        use () {
+
+            return 'Revolver shot...';
+        }
+    }
+
+    @injectable()
+    class Water {
+
+        drink () {
+
+            return 'Gulp, gulp, gulp...';
+        };
+    }
+
+    // interfaces disappear after compilation, so we need to create an InjectToken
+    // for the interface if we want to use it in the injector
+    const WEAPON_TOKEN = new InjectToken<Weapon>('Weapon');
+
+    // we can also create tokens for arbitrary values
+    const NAME_TOKEN = new InjectToken<string>('NAME');
+
+    @injectable()
+    class Warrior {
+
+        @optional() @inject(NAME_TOKEN)
+        public name!: string;
+
+        constructor (@inject(WEAPON_TOKEN) public weapon: Weapon, public drink?: Water) { }
+
+        fight (useWeapon: boolean = false) {
+
+            return `${ this.name } fights: ${ useWeapon ? this.weapon.use() : 'Fist punch...' }`;
+        }
+
+        rest () {
+
+            return `${ this.name } rests: ${ this.drink ? this.drink.drink() : '' }`;
+        }
+    }
 
     it('should create an injector', () => {
+
+        const injector = new Injector();
 
         expect(injector).toBeDefined();
         expect(injector instanceof Injector).toBe(true);
     });
 
     it('should resolve classes', () => {
+
+        const injector = new Injector();
 
         expect(injector.resolve(Sword)! instanceof Sword).toBe(true);
         expect(injector.resolve(Sword)!.use()).toBe('Sword strike...');
@@ -100,6 +97,8 @@ describe('Injector', () => {
     });
 
     it('should resolve tokens', () => {
+
+        const injector = new Injector();
 
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
         injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
@@ -111,6 +110,8 @@ describe('Injector', () => {
     });
 
     it('should resolve dependencies correctly', () => {
+
+        const injector = new Injector();
 
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
         injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
@@ -138,6 +139,8 @@ describe('Injector', () => {
 
     it('can be configured with different dependencies', () => {
 
+        const injector = new Injector();
+
         injector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
         injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
 
@@ -153,6 +156,8 @@ describe('Injector', () => {
     });
 
     it('should resolve singleton dependencies correctly', () => {
+
+        const injector = new Injector();
 
         injector.provide(WEAPON_TOKEN, new SingletonProvider(Gun));
         injector.provide(NAME_TOKEN, new ValueProvider('Smith'));
@@ -175,6 +180,8 @@ describe('Injector', () => {
 
     it('should throw exception on missing dependencies', () => {
 
+        const injector = new Injector();
+
         injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
 
         const resolve = () => {
@@ -186,6 +193,8 @@ describe('Injector', () => {
     });
 
     it('should pass undefined for optional missing dependency', () => {
+
+        const injector = new Injector();
 
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
 
@@ -201,6 +210,8 @@ describe('Injector', () => {
     });
 
     it('can use parent injectors', () => {
+
+        const injector = new Injector();
 
         // we set up the root injector
         injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));

@@ -18,6 +18,9 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
+            // load the polyfill with @abraham/reflection only once (it uses a WeakMap to store
+            // metadata and loading it more than once, will override previous metadata)
+            { pattern: 'dev/polyfill.js', watched: false },
             // don't watch the spec files, rollup-preprocessor will watch them
             { pattern: 'dev/**/*.spec.js', watched: false }
         ],

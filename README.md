@@ -6,9 +6,9 @@ A lightweight reflective dependency injection container.
 [![Coverage Status](https://coveralls.io/repos/github/alexanderwende/injector/badge.svg?branch=master)](https://coveralls.io/github/alexanderwende/injector?branch=master)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-- Minified Size:  3.9 KB
-- Gzipped Size:  1.46 KB
-- Brotli size: 1.29 KB
+- Minified Size:  3.88 KB
+- Gzipped Size:  1.44 KB
+- Brotli size: 1.27 KB
 
 ## Features
 
@@ -67,7 +67,6 @@ import { Injector, injectable } from 'injector';
 class FooService {
 
     getFoo () {
-
         return 'foo';
     }
 }
@@ -85,7 +84,7 @@ class FooClient {
 const injector = new Injector();
 
 // create instances by letting the `Injector` resolve them
-const fooClient = injector.resolve(FooClient);
+const fooClient = injector.resolve(FooClient)!;
 
 fooClient.service.getFoo(); // --> 'foo'
 ```
@@ -108,7 +107,6 @@ import { Injector, injectable, inject } from 'injector';
 class FooService {
 
     getFoo () {
-
         return 'foo';
     }
 }
@@ -119,7 +117,7 @@ class FooClient {
 
     // decorate the property you want to inject
     @inject()
-    public service: FooService;
+    public service!: FooService;
 }
 
 
@@ -127,7 +125,7 @@ class FooClient {
 const injector = new Injector();
 
 // create instances by letting the `Injector` resolve them
-const fooClient = injector.resolve(FooClient);
+const fooClient = injector.resolve(FooClient)!;
 
 fooClient.service.getFoo(); // --> 'foo'
 ```
@@ -151,7 +149,6 @@ const FOO_SERVICE = new InjectToken<FooService>('FooService');
 class FooServiceImplementation implements FooService {
 
     getFoo () {
-
         return 'foo';
     }
 }
@@ -173,7 +170,7 @@ const injector = new Injector();
 injector.provide(FOO_SERVICE, new ClassProvider(FooServiceImplementation));
 
 // create instances by letting the `Injector` resolve them
-const fooClient = injector.resolve(FooClient);
+const fooClient = injector.resolve(FooClient)!;
 
 fooClient.service.getFoo(); // --> 'foo'
 ```

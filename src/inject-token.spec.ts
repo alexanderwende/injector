@@ -6,7 +6,7 @@ const Bar = Symbol('Bar');
 
 describe('InjectToken', () => {
 
-    it('creates an inject token', () => {
+    it('should create an inject token', () => {
 
         const token = new InjectToken('TOKEN_NAME');
 
@@ -15,7 +15,7 @@ describe('InjectToken', () => {
         expect(typeof token.value === 'symbol').toBe(true);
     });
 
-    it('creates an inject token with the same symbol for the same class', () => {
+    it('should create an inject token with the same symbol for the same class', () => {
 
         const token = new InjectToken(Foo);
 
@@ -35,7 +35,7 @@ describe('InjectToken', () => {
         expect(token === token2).toBe(false);
     });
 
-    it('creates an inject token with the same symbol for the same symbol', () => {
+    it('should create an inject token with the same symbol for the same symbol', () => {
 
         const token = new InjectToken(Bar);
 
