@@ -6,12 +6,12 @@ Constructs a new instance of the [ValueProvider](./injector.valueprovider.md) cl
 
 **Signature:**
 ```javascript
-constructor(value: any);
+constructor(value: T);
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `value` | `any` |  |
+|  `value` | `T` |  |
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.6](https://github.com/alexanderwende/injector/compare/v1.0.5...v1.0.6) (2019-03-12)
+
+
+### Bug Fixes
+
+* allow optional class dependencies ([70e7079](https://github.com/alexanderwende/injector/commit/70e7079))
+* decouple injector from metadata implementation ([e54d817](https://github.com/alexanderwende/injector/commit/e54d817))
+
+
+
 ## 1.0.5 (2019-03-09)
 
 
