@@ -3,7 +3,7 @@ import { BaseProvider } from './base-provider';
 
 export class ValueProvider<T> extends BaseProvider<T> {
 
-    constructor (value: any) {
+    constructor (value: T) {
 
         super(createValueFactory(value));
     }

@@ -1,5 +1,5 @@
 import { injectable } from './injectable';
-import { inject } from './inject';
+import { inject, CLASS_NOT_INJECTABLE } from './inject';
 import { Injector } from '../injector';
 import { InjectToken } from '../inject-token';
 import { ClassProvider } from '../providers';
@@ -43,11 +43,11 @@ describe('@inject', () => {
 
         const injector = new Injector();
 
-        const fooClient = injector.resolve(MessageClient)!;
+        const client = injector.resolve(MessageClient)!;
 
-        expect(fooClient.service).toBeDefined();
-        expect(fooClient.service instanceof FooMessageService).toBe(true);
-        expect(fooClient.service.getMessage()).toBe('foo');
+        expect(client.service).toBeDefined();
+        expect(client.service instanceof FooMessageService).toBe(true);
+        expect(client.service.getMessage()).toBe('foo');
     });
 
     it('should inject tokens', () => {
@@ -68,11 +68,11 @@ describe('@inject', () => {
         injector.provide(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
 
         // create instances by letting the `Injector` resolve them
-        const fooClient = injector.resolve(MessageClient)!;
+        const client = injector.resolve(MessageClient)!;
 
-        expect(fooClient.service).toBeDefined();
-        expect(fooClient.service instanceof FooMessageService).toBe(true);
-        expect(fooClient.service.getMessage()).toBe('foo');
+        expect(client.service).toBeDefined();
+        expect(client.service instanceof FooMessageService).toBe(true);
+        expect(client.service.getMessage()).toBe('foo');
     });
 
     it('should inject tokens into class properties', () => {
@@ -88,11 +88,11 @@ describe('@inject', () => {
 
         injector.provide(MESSAGE_SERVICE, new ClassProvider(BarMessageService));
 
-        const fooClient = injector.resolve(MessageClient)!;
+        const client = injector.resolve(MessageClient)!;
 
-        expect(fooClient.service).toBeDefined();
-        expect(fooClient.service instanceof BarMessageService).toBe(true);
-        expect(fooClient.service.getMessage()).toBe('bar');
+        expect(client.service).toBeDefined();
+        expect(client.service instanceof BarMessageService).toBe(true);
+        expect(client.service.getMessage()).toBe('bar');
     });
 
     it('should have no effect on a typed constructor parameter', () => {
@@ -127,5 +127,21 @@ describe('@inject', () => {
         expect(fooClient.service).toBeDefined();
         expect(fooClient.service instanceof BarMessageService).toBe(true);
         expect(fooClient.service.getFoo()).toBe('bar');
+    });
+
+    it('should throw on non-injectable dependencies', () => {
+
+        class NonInjectableService {}
+
+        const injectParam = () => {
+
+            @injectable()
+            class MessageClient {
+
+                constructor (@inject(NonInjectableService) public service: any) {}
+            }
+        }
+
+        expect(injectParam).toThrowError(CLASS_NOT_INJECTABLE(NonInjectableService).message);
     });
 });

@@ -89,8 +89,13 @@ export class Injector {
 
         const token: InjectToken<T> | undefined = getTokenAnnotation(constructorFn);
 
-        // class was not decorated with @injectable, throw
-        if (!token) throw CLASS_NOT_PROVIDABLE(constructorFn);
+        // class was not decorated with @injectable
+        if (!token) {
+
+            if(!optional) throw CLASS_NOT_PROVIDABLE(constructorFn);
+
+            return undefined;
+        }
 
         // class has no provider yet, we create one
         if (!this._getProvider(token)) {

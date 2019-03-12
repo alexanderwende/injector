@@ -43,6 +43,8 @@ Reflection is the most lightweight implementation (~3K) yet and therefore the pe
 npm install --save @abraham/reflection
 ```
 
+If you are already using `reflect-metadata` or `core-js/es7/reflect` you don't have to install anything else. Just make sure to load the polyfill before loading injector.
+
 To use injector make sure to enable experimental decorators and decorator metadata in your `tsconfig.json`:
 
 ```json
@@ -64,19 +66,19 @@ import { Injector, injectable } from 'injector';
 
 // decorate the dependency as injectable
 @injectable()
-class FooService {
+class MessageService {
 
-    getFoo () {
+    getMessage () {
         return 'foo';
     }
 }
 
 // decorate the consumer as injectable
 @injectable()
-class FooClient {
+class MessageClient {
 
     // `Injector` will resolve constructor parameter dependencies automatically
-    constructor (public service: FooService) {}
+    constructor (public service: MessageService) {}
 }
 
 
@@ -84,14 +86,14 @@ class FooClient {
 const injector = new Injector();
 
 // create instances by letting the `Injector` resolve them
-const fooClient = injector.resolve(FooClient)!;
+const client = injector.resolve(MessageClient)!;
 
-fooClient.service.getFoo(); // --> 'foo'
+client.service.getMessage(); // --> 'foo'
 ```
 
 ### @injectable
 
-The `@injectable` decorator marks a class as injectable by creating an `InjectToken` for the constructor and storing it as metadata on the class. The `Injector` will later use the stored `InjectToken` to find the appropriate provider for the token and resolve its dependencies. Constructor parameter dependencies are automatically resolved by type, as long as the depended on classes have been marked as injectable as well. `Injector` relies on TypeScript emitting decorator metadata for that.
+The `@injectable` decorator marks a class as injectable by creating an `InjectToken` for the constructor and storing it as metadata on the class. The `Injector` will later use the stored `InjectToken` to find the appropriate provider for the token and resolve its dependencies. Constructor parameter dependencies are automatically resolved by type, as long as the depended-on classes have been marked as injectable as well. `Injector` relies on TypeScript emitting decorator metadata for that.
 
 ### @inject
 
@@ -104,20 +106,20 @@ import { Injector, injectable, inject } from 'injector';
 
 // decorate the dependency as injectable
 @injectable()
-class FooService {
+class MessageService {
 
-    getFoo () {
+    getMessage () {
         return 'foo';
     }
 }
 
 // decorate the consumer as injectable
 @injectable()
-class FooClient {
+class MessageClient {
 
     // decorate the property you want to inject
     @inject()
-    public service!: FooService;
+    public service!: MessageService;
 }
 
 
@@ -125,9 +127,9 @@ class FooClient {
 const injector = new Injector();
 
 // create instances by letting the `Injector` resolve them
-const fooClient = injector.resolve(FooClient)!;
+const client = injector.resolve(MessageClient)!;
 
-fooClient.service.getFoo(); // --> 'foo'
+client.service.getMessage(); // --> 'foo'
 ```
 
 **Injecting non-class dependencies through `InjectToken`s**. Primitive values - and values in general - can not be injected reflectively as they can't be solely identified by a type. Interfaces disappear at runtime and connot be injected reflectively either. For those cases we need an `InjectToken` to tie the value or interface to a token that can be identified by the injector. You can read more about [`InjectToken`](#injecttoken)s below.
@@ -135,49 +137,86 @@ fooClient.service.getFoo(); // --> 'foo'
 ```typescript
 import { Injector, InjectToken, injectable, inject, ClassProvider } from 'injector';
 
-// an interface describing the FooService
-interface FooService {
-    getFoo (): string;
+// an interface describing the MessageService
+interface MessageService {
+    getMessage (): string;
 }
 
 // an `InjectToken` representing the interface
-// use a generic type to let TypeScript know about the token's type
-const FOO_SERVICE = new InjectToken<FooService>('FooService');
+// use a generic type to tie the token to the interface type
+const MESSAGE_SERVICE = new InjectToken<MessageService>('MessageService');
 
-// a class implementing the FooService interface - decorated as injectable
+// a class implementing the MessageService interface - decorated as injectable
 @injectable()
-class FooServiceImplementation implements FooService {
+class FooMessageService implements MessageService {
 
-    getFoo () {
+    getMessage () {
         return 'foo';
     }
 }
 
 // decorate the consumer as injectable
 @injectable()
-class FooClient {
+class MessageClient {
 
     // inject the implementation by using the `@inject` decorator and the `InjectToken`
-    constructor (@inject(FOO_SERVICE) public service: FooService) {}
+    constructor (@inject(MESSAGE_SERVICE) public service: MessageService) {}
 }
 
 
 // create an `Injector` instance
 const injector = new Injector();
 
-// tell the injector how to provide the FOO_SERVICE token
+// tell the injector how to provide the MESSAGE_SERVICE token
 // we are using a `ClassProvider` here, but we could use other providers as well
-injector.provide(FOO_SERVICE, new ClassProvider(FooServiceImplementation));
+injector.provide(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
 
 // create instances by letting the `Injector` resolve them
-const fooClient = injector.resolve(FooClient)!;
+const client = injector.resolve(MessageClient)!;
 
-fooClient.service.getFoo(); // --> 'foo'
+client.service.getMessage(); // --> 'foo'
 ```
 
 ### @optional
 
-By default, `Injector` will throw an error, if a dependency cannot be resolved. 
+By default, `Injector` will throw an error if a dependency cannot be resolved. In some cases, however, you might want a dependency to be optional. To tell the injector that a dependency is optional use the `@optional` decorator. If the injector cannot find a provider for an optional dependency it will resolve it with `undefined`.
+
+```typescript
+import { Injector, InjectToken, injectable, inject, optional } from 'injector';
+
+// a non-injectable class
+class BarMesageService {
+    getMessage (): string {
+        return 'bar';
+    }
+}
+
+interface MessageClientConfig {
+    checkMessages: boolean;
+    answerMessages: boolean;
+}
+
+// an InjectToken for an interface which we won't provide
+const CONFIG = new InjectToken<MessageClientConfig>('MessageClientConfig');
+
+@injectable()
+class MessageClient {
+    constructor (
+        // BarMessageService is not injectable, by marking it as optional it won't throw an error
+        @optional() public service?: BarMesageService,
+        // CONFIG has no provider, by marking it as optional won't throw an error
+        @optional() @inject(CONFIG) public config?: MessageClientConfig
+    ) { }
+}
+
+
+const injector = new Injector();
+
+const client = injector.resolve(MessageClient)!;
+
+// client.service --> undefined
+// client.config --> undefined
+```
 
 ### Injector
 
@@ -186,99 +225,3 @@ By default, `Injector` will throw an error, if a dependency cannot be resolved.
 ### Provider
 
 ### Factory
-
-## Usage
-
-```ts
-interface Weapon {
-
-    use (): string;
-}
-
-@injectable()
-class Sword implements Weapon {
-
-    use () {
-
-        return 'Sword strike...';
-    }
-}
-
-@injectable()
-class Gun implements Weapon {
-
-    use () {
-
-        return 'Gun shot...';
-    }
-}
-
-@injectable()
-class Water {
-
-    drink () {
-
-        return 'Gulp, gulp, gulp...';
-    };
-}
-
-// interfaces disappear after compilation, so we need to create an InjectToken
-// for the interface if we want to use it in the injector
-const WEAPON_TOKEN = new InjectToken<Weapon>('Weapon');
-
-// we can also create tokens for arbitrary values
-const NAME_TOKEN = new InjectToken<string>('NAME');
-
-@injectable()
-class Warrior {
-
-    // properties can be injected as well - this is useful if your class
-    // doesn't have a constructor
-    @optional() @inject(NAME_TOKEN)
-    public name!: string;
-
-    constructor (@inject(WEAPON_TOKEN) public weapon: Weapon, public drink?: Water) {}
-
-    fight (useWeapon: boolean = false) {
-
-        return `${this.name} fights: ${useWeapon ? this.weapon.use() : 'Fist punch...'}`;
-    }
-
-    rest () {
-
-        return `${this.name} rests: ${this.drink ? this.drink.drink() : ''}`;
-    }
-}
-
-
-
-// create an injector
-const injector = new Injector();
-
-// register custom InjectTokens with a provider
-injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
-injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
-
-// create an instance by resolving from the injector
-const warrior = injector.resolve<Warrior>(Warrior)!;
-
-expect(warrior.name).toBe('Clay');
-expect(warrior.weapon instanceof Sword).toBe(true);
-expect(warrior.drink instanceof Water).toBe(true);
-
-
-
-// you can create child injectors to handle dependencies in different scopes
-const childInjector = new Injector(injector);
-
-// register different providers for the child injector
-// all other providers will be resolved from the parent injector
-childInjector.provide(NAME_TOKEN, new ValueProvider('John'));
-
-// create an instance by resolving from the child injector
-const warrior2 = childInjector.resolve<Warrior>(Warrior)!;
-
-expect(warrior.name).toBe('John');
-expect(warrior.weapon instanceof Sword).toBe(true);
-expect(warrior.drink instanceof Water).toBe(true);
-```
