@@ -1,4 +1,4 @@
-import { ParameterAnnotation, PropertyAnnotation } from '../annotations';
+import { ParameterAnnotations, PropertyAnnotations } from '../annotations';
 import { Factory } from '../factories';
 import { Injector } from '../injector';
 import { Provider } from './provider';
@@ -14,8 +14,8 @@ export class BaseProvider<T> implements Provider<T> {
 
     constructor (
         public factory: Factory<T>,
-        public dependencies: ParameterAnnotation[] = [],
-        public properties: { [key: string]: PropertyAnnotation } = {}) { }
+        public dependencies: ParameterAnnotations = [],
+        public properties: PropertyAnnotations = {}) { }
 
     provide (injector?: Injector): T {
 

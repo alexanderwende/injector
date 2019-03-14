@@ -6,6 +6,7 @@ export class InjectToken<T = any> {
 
     value: Symbol;
 
+    // TODO: should inject token need to accept anything else, but a description string?
     constructor (value: Constructor<T> | symbol | string) {
 
         if (isConstructor(value)) {

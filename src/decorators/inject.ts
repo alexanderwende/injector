@@ -1,4 +1,4 @@
-import { getParameterAnnotation, getPropertyAnnotation, getTokenAnnotation } from '../annotations';
+import { getParameterAnnotation, getPropertyAnnotation, getTokenAnnotation, setParameterAnnotation, setPropertyAnnotation } from '../annotations';
 import { InjectToken } from '../inject-token';
 import { Constructor } from '../utils';
 
@@ -7,6 +7,7 @@ import { Constructor } from '../utils';
  */
 export const CLASS_NOT_INJECTABLE = (constructorFn: Constructor) => new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be injected.`);
 
+// TODO: inject should only accept InjectTokens, not constructors
 export const inject = <T> (constructorOrToken?: Constructor<T> | InjectToken<T>) => {
 
     return (target: Object, propertyKey: string | symbol, parameterIndex?: number): void => {
@@ -19,7 +20,7 @@ export const inject = <T> (constructorOrToken?: Constructor<T> | InjectToken<T>)
                 ? getTokenAnnotation(constructorOrToken)
                 : (isParameterDecorator)
                     ? getParameterAnnotation(target as Constructor, parameterIndex!).token
-                    : getPropertyAnnotation(target.constructor as Constructor, propertyKey as string).token;
+                    : getPropertyAnnotation(target.constructor as Constructor, propertyKey).token;
 
         // token can only be undefined, when injecting a class type
         if (!token) {
@@ -30,16 +31,36 @@ export const inject = <T> (constructorOrToken?: Constructor<T> | InjectToken<T>)
         if (isParameterDecorator) {
 
             // decorator is a parameter decorator
-            const parameterAnnotation = getParameterAnnotation(target as Constructor, parameterIndex!);
-
-            parameterAnnotation.token = token;
+            setParameterAnnotation(target as Constructor, parameterIndex!, { token });
 
         } else {
 
             // decorator is a property decorator
-            const propertyAnnotation = getPropertyAnnotation(target.constructor as Constructor, propertyKey as string);
+            setPropertyAnnotation(target.constructor as Constructor, propertyKey, { token });
+        }
+    };
+};
 
-            propertyAnnotation.token = token;
+export const inject2 = <T> (injectToken?: InjectToken<T>) => {
+
+    return (target: Object, propertyKey: PropertyKey, parameterIndex?: number): void => {
+
+        const isParameterDecorator = typeof parameterIndex === 'number';
+
+        const token: InjectToken<T> | Constructor<T> = injectToken instanceof InjectToken
+            ? injectToken
+            : isParameterDecorator
+                ? getParameterAnnotation(target as Constructor, parameterIndex!).token
+                : getPropertyAnnotation(target.constructor as Constructor, propertyKey).token;
+
+
+        if (isParameterDecorator) {
+
+            setParameterAnnotation(target as Constructor, parameterIndex!, { token });
+
+        } else {
+
+            setPropertyAnnotation(target.constructor as Constructor, propertyKey, { token });
         }
     };
 };

@@ -178,6 +178,35 @@ describe('Injector', () => {
         expect(warrior.weapon).toBe(warrior2.weapon);
     });
 
+    // this is new
+    it('should allow providing classes directly', () => {
+
+        @injectable()
+        class MessageService {
+
+            getMessage (): string {
+                return 'message';
+            }
+        }
+
+        @injectable()
+        class MessageClient {
+
+            constructor (public service: MessageService) {}
+        }
+
+        const injector = new Injector();
+
+        injector.provide(MessageService, new SingletonProvider(MessageService));
+
+        const client1 = injector.resolve(MessageClient)!;
+        const client2 = injector.resolve(MessageClient)!;
+
+        expect(client1.service instanceof MessageService).toBe(true);
+        expect(client2.service instanceof MessageService).toBe(true);
+        expect(client1.service).toBe(client2.service);
+    });
+
     it('should throw exception on missing dependencies', () => {
 
         const injector = new Injector();

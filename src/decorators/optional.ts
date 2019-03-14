@@ -1,4 +1,4 @@
-import { getParameterAnnotation, getPropertyAnnotation } from '../annotations';
+import { setParameterAnnotation, setPropertyAnnotation } from '../annotations';
 import { Constructor } from '../utils';
 
 export const optional = () => {
@@ -8,16 +8,12 @@ export const optional = () => {
         if (typeof parameterIndex === 'number') {
 
             // decorator is a parameter decorator
-            const parameterAnnotation = getParameterAnnotation(target as Constructor<any>, parameterIndex);
-
-            parameterAnnotation.optional = true;
+            setParameterAnnotation(target as Constructor, parameterIndex, { optional: true });
 
         } else {
 
             // decorator is a property decorator
-            const propertyAnnotation = getPropertyAnnotation(target.constructor as Constructor<any>, propertyKey as string);
-
-            propertyAnnotation.optional = true;
+            setPropertyAnnotation(target.constructor as Constructor, propertyKey, { optional: true });
         }
     };
 };

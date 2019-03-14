@@ -7,7 +7,7 @@ class Class {
 
 describe('createClassFactory', () => {
 
-    it('creates a factory for a class', () => {
+    it('should create a factory for a class', () => {
 
         const factory      = createClassFactory(Class);
         const dependencies = ['Alex'];
@@ -17,7 +17,11 @@ describe('createClassFactory', () => {
         expect(instance.name).toBe('Alex');
     });
 
-    it('factory returns a new instance every time', () => {
+});
+
+describe('ClassFactory', () => {
+
+    it('should return a new instance every time', () => {
 
         const factory      = createClassFactory(Class);
         const dependencies = ['Alex'];

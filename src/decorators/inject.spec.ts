@@ -50,7 +50,7 @@ describe('@inject', () => {
         expect(client.service.getMessage()).toBe('foo');
     });
 
-    it('should inject tokens', () => {
+    it('should inject tokens into constructor parameters', () => {
 
         // decorate the consumer as injectable
         @injectable()
@@ -95,6 +95,49 @@ describe('@inject', () => {
         expect(client.service.getMessage()).toBe('bar');
     });
 
+    it('should inject tokens into numeric class properties', () => {
+
+        @injectable()
+        class MessageClient {
+
+            @inject(MESSAGE_SERVICE)
+            public 0: BarMessageService;
+        }
+
+        const injector = new Injector();
+
+        injector.provide(MESSAGE_SERVICE, new ClassProvider(BarMessageService));
+
+        const client = injector.resolve(MessageClient)!;
+
+        expect(client[0]).toBeDefined();
+        expect(client[0] instanceof BarMessageService).toBe(true);
+        expect(client[0].getMessage()).toBe('bar');
+    });
+
+    // TODO: investigate why this fails
+    xit('should inject tokens into symbol class properties', () => {
+
+        const symbol = Symbol();
+
+        @injectable()
+        class MessageClient {
+
+            @inject(MESSAGE_SERVICE)
+            public [symbol]: BarMessageService;
+        }
+
+        const injector = new Injector();
+
+        injector.provide(MESSAGE_SERVICE, new ClassProvider(BarMessageService));
+
+        const client = injector.resolve(MessageClient)!;
+
+        expect(client[symbol]).toBeDefined();
+        expect(client[symbol] instanceof BarMessageService).toBe(true);
+        expect(client[symbol].getMessage()).toBe('bar');
+    });
+
     it('should have no effect on a typed constructor parameter', () => {
 
         @injectable()
@@ -112,11 +155,12 @@ describe('@inject', () => {
         expect(fooClient.service.getMessage()).toBe('foo');
     });
 
+    // TODO: remove this when inject only accepts tokens
     xit('should inject dependencies by class', () => {
 
         @injectable()
         class MessageClient {
-            // FIXME: this corrently throws a NO_PROVIDER error
+            // FIXME: this currently throws a NO_PROVIDER error
             constructor (@inject(FooMessageService) public service: any) {}
         }
 
@@ -129,7 +173,8 @@ describe('@inject', () => {
         expect(fooClient.service.getFoo()).toBe('bar');
     });
 
-    it('should throw on non-injectable dependencies', () => {
+    // TODO: remove this when inject only accepts tokens
+    xit('should throw on non-injectable dependencies', () => {
 
         class NonInjectableService {}
 
