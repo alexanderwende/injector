@@ -6,7 +6,7 @@ export const injectable = () => {
 
     return (target: Constructor<object>) => {
 
-        const token = new InjectToken(target);
+        const token = new InjectToken(target.name);
 
         setTokenAnnotation(target, token);
     };
