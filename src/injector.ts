@@ -38,6 +38,8 @@ export class Injector {
     constructor (parent?: Injector) {
 
         if (parent) this._parent = parent;
+
+        // TODO: add provider for injector instance itself
     }
 
     /**

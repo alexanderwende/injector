@@ -11,14 +11,14 @@ export interface DependencyAnnotation<T = any> {
 }
 
 /**
- * An array of constructor parameter dependency annotations
+ * A map of constructor parameter dependency annotations
  */
-export type ParameterAnnotations = DependencyAnnotation[];
+export type ParameterAnnotations = Map<number, DependencyAnnotation>;
 
 /**
  * A map of class property dependency annotations
  */
-export type PropertyAnnotations = { [key: string]: DependencyAnnotation };
+export type PropertyAnnotations = Map<PropertyKey, DependencyAnnotation>;
 
 /**
  * Gets the {@link InjectToken} of a class
@@ -49,7 +49,7 @@ export const getParameterAnnotation = (target: Constructor, parameterIndex: numb
 
     ensureParameterAnnotations(target);
 
-    return (Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target) as ParameterAnnotations)[parameterIndex];
+    return (Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target) as ParameterAnnotations).get(parameterIndex)!;
 };
 
 /**
@@ -66,7 +66,7 @@ export const setParameterAnnotation = (
 
     const annotations = Reflect.getOwnMetadata(ANNOTATION.PARAMETERS, target) as ParameterAnnotations;
 
-    Object.assign(annotations[parameterIndex], annotation);
+    Object.assign(annotations.get(parameterIndex), annotation);
 };
 
 /**
@@ -91,7 +91,7 @@ export const getPropertyAnnotation = (target: Constructor, propertyKey: Property
     ensurePropertyAnnotation(target, propertyKey);
 
     // we have to use a type cast as TypeScript currently doesn't support Symbols as index types
-    return (Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target) as PropertyAnnotations)[propertyKey as string];
+    return (Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target) as PropertyAnnotations).get(propertyKey)!;
 };
 
 /**
@@ -108,8 +108,7 @@ export const setPropertyAnnotation = (
 
     const annotations = Reflect.getOwnMetadata(ANNOTATION.PROPERTIES, target) as PropertyAnnotations;
 
-    // we have to use a type cast as TypeScript currently doesn't support Symbols as index types
-    Object.assign(annotations[propertyKey as string], annotation);
+    Object.assign(annotations.get(propertyKey), annotation);
 };
 
 /**
@@ -131,7 +130,10 @@ const ensureParameterAnnotations = (target: Constructor) => {
     if (!Reflect.hasOwnMetadata(ANNOTATION.PARAMETERS, target)) {
 
         const parameterTypes: Constructor[] = Reflect.getOwnMetadata(ANNOTATION.DESIGN_PARAMETER_TYPES, target) || [];
-        const parameterAnnotations: ParameterAnnotations = parameterTypes.map(type => createDependencyAnnotation(type));
+        const parameterAnnotations: ParameterAnnotations = new Map(
+            parameterTypes.map(
+                (type, index) => [index, createDependencyAnnotation(type)] as [number, DependencyAnnotation]
+            ));
 
         Reflect.defineMetadata(ANNOTATION.PARAMETERS, parameterAnnotations, target);
     }
@@ -141,18 +143,17 @@ const ensurePropertyAnnotation = (target: Constructor, propertyKey: PropertyKey)
 
     const properties = getPropertyAnnotations(target);
 
-    if (!properties.hasOwnProperty(propertyKey)) {
+    if (!properties.has(propertyKey)) {
 
-        const type = Reflect.getOwnMetadata(
+        const propertyType = Reflect.getOwnMetadata(
             ANNOTATION.DESIGN_TYPE,
             target.prototype,
             // we force a type cast here as reflection types the PropertyKey as string | symbol,
-            // at runtime numberic property keys work too
+            // at runtime numeric property keys work too
             propertyKey as string | symbol
         ) as InjectToken | Constructor;
 
-        // we have to use a type cast as TypeScript currently doesn't support Symbols as index types
-        properties[propertyKey as string] = createDependencyAnnotation(type);
+        properties.set(propertyKey, createDependencyAnnotation(propertyType));
     }
 };
 
@@ -160,7 +161,7 @@ const ensurePropertyAnnotations = (target: Constructor) => {
 
     if (!Reflect.hasOwnMetadata(ANNOTATION.PROPERTIES, target)) {
 
-        Reflect.defineMetadata(ANNOTATION.PROPERTIES, {}, target);
+        Reflect.defineMetadata(ANNOTATION.PROPERTIES, new Map(), target);
     }
 };
 

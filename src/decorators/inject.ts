@@ -78,7 +78,7 @@ export const inject = <T> (injectToken?: InjectToken<T>) => {
                 ? getParameterAnnotation(target as Constructor, parameterIndex!).token
                 : getPropertyAnnotation(target.constructor as Constructor, propertyKey).token;
 
-
+        // TODO: This sets the token twice - once during the get (caused by ensure) and then by the set
         if (isParameterDecorator) {
 
             setParameterAnnotation(target as Constructor, parameterIndex!, { token });

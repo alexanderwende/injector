@@ -1,4 +1,3 @@
-import { getPropertyAnnotation, getPropertyAnnotations } from '../annotations';
 import { InjectToken } from '../inject-token';
 import { Injector } from '../injector';
 import { ClassProvider } from '../providers';
@@ -116,8 +115,7 @@ describe('@inject', () => {
         expect(client[0].getMessage()).toBe('bar');
     });
 
-    // TODO: investigate why this fails
-    xit('should inject tokens into symbol class properties', () => {
+    it('should inject tokens into symbol class properties', () => {
 
         const symbol = Symbol();
 
@@ -127,10 +125,6 @@ describe('@inject', () => {
             @inject(MESSAGE_SERVICE)
             public [symbol]: BarMessageService;
         }
-
-        console.log('design:type:', Reflect.getOwnMetadata('design:type', MessageClient.prototype, symbol));
-        console.log('getPropertyAnnotation:', getPropertyAnnotation(MessageClient, symbol));
-        console.log('getPropertyAnnotations:', getPropertyAnnotations(MessageClient));
 
         const injector = new Injector();
 
