@@ -2,18 +2,19 @@
 
 # BaseProvider.resolveProperties method
 
+Resolves the property dependencies for the factory from the current injector
 
 **Signature:**
 ```javascript
-resolveProperties:
+protected resolveProperties(injector: Injector): any;
 ```
-**Returns:** `{
-        [key: string]: any;
-    }`
+**Returns:** `any`
+
+An object of resolved property dependencies
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `injector` | `Injector` |  |
+|  `injector` | `Injector` | The current injector that runs the provider |
 

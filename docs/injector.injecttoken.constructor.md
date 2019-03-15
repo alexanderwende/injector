@@ -6,12 +6,12 @@ Constructs a new instance of the [InjectToken](./injector.injecttoken.md) class
 
 **Signature:**
 ```javascript
-constructor(value: Constructor<T> | symbol | string);
+constructor(description: string);
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `value` | `Constructor<T> | symbol | string` |  |
+|  `description` | `string` |  |
 

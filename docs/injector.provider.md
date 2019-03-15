@@ -6,10 +6,10 @@
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [`dependencies`](./injector.provider.dependencies.md) | `ParameterAnnotation[]` |  |
+|  [`dependencies`](./injector.provider.dependencies.md) | `ParameterAnnotations` |  |
 |  [`factory`](./injector.provider.factory.md) | `Factory<T>` |  |
 |  [`injector`](./injector.provider.injector.md) | `Injector | undefined` |  |
-|  [`properties`](./injector.provider.properties.md) | `{`<p/>`        [key: string]: PropertyAnnotation;`<p/>`    }` |  |
+|  [`properties`](./injector.provider.properties.md) | `PropertyAnnotations` |  |
 
 ## Methods
 

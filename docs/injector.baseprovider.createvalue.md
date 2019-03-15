@@ -2,19 +2,20 @@
 
 # BaseProvider.createValue method
 
+Creates the provider's provided value by invoking the factory
 
 **Signature:**
 ```javascript
-createValue(dependencies?: any[], properties?: {
-        [key: string]: any;
-    }): T;
+protected createValue(dependencies?: any[], properties?: any): T;
 ```
 **Returns:** `T`
+
+The value created by the provider's factory
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `dependencies` | `any[]` |  |
-|  `properties` | `{`<p/>`        [key: string]: any;`<p/>`    }` |  |
+|  `dependencies` | `any[]` | The parameter dependencies of the factory |
+|  `properties` | `any` | The property dependencies of the instance returned from the factory |
 

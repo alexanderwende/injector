@@ -2,6 +2,7 @@
 
 # BaseProvider.provide method
 
+Get the provider's provided value
 
 **Signature:**
 ```javascript
@@ -13,5 +14,5 @@ provide(injector?: Injector): T;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `injector` | `Injector` |  |
+|  `injector` | `Injector` | The injector to use to resolve the provider's dependencies |
 

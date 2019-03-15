@@ -2,16 +2,19 @@
 
 # BaseProvider.resolveDependencies method
 
+Resolves the parameter dependencies for the factory from the current injector
 
 **Signature:**
 ```javascript
-resolveDependencies(injector: Injector): any[];
+protected resolveDependencies(injector: Injector): any[];
 ```
 **Returns:** `any[]`
+
+An array of resolved parameter dependencies
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `injector` | `Injector` |  |
+|  `injector` | `Injector` | The current injector that runs the provider |
 

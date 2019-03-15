@@ -6,9 +6,9 @@ A lightweight reflective dependency injection container.
 [![Coverage Status](https://coveralls.io/repos/github/alexanderwende/injector/badge.svg?branch=master)](https://coveralls.io/github/alexanderwende/injector?branch=master)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-- Minified Size:  3.88 KB
-- Gzipped Size:  1.44 KB
-- Brotli size: 1.27 KB
+- Minified Size:  3.53 KB
+- Gzipped Size:  1.29 KB
+- Brotli size: 1.16 KB
 
 ## Features
 
