@@ -1,8 +1,9 @@
-import { injectable } from './injectable';
-import { inject, CLASS_NOT_INJECTABLE } from './inject';
-import { Injector } from '../injector';
+import { getPropertyAnnotation, getPropertyAnnotations } from '../annotations';
 import { InjectToken } from '../inject-token';
+import { Injector } from '../injector';
 import { ClassProvider } from '../providers';
+import { inject } from './inject';
+import { injectable } from './injectable';
 
 describe('@inject', () => {
 
@@ -127,6 +128,10 @@ describe('@inject', () => {
             public [symbol]: BarMessageService;
         }
 
+        console.log('design:type:', Reflect.getOwnMetadata('design:type', MessageClient.prototype, symbol));
+        console.log('getPropertyAnnotation:', getPropertyAnnotation(MessageClient, symbol));
+        console.log('getPropertyAnnotations:', getPropertyAnnotations(MessageClient));
+
         const injector = new Injector();
 
         injector.provide(MESSAGE_SERVICE, new ClassProvider(BarMessageService));
@@ -153,40 +158,5 @@ describe('@inject', () => {
         expect(fooClient.service).toBeDefined();
         expect(fooClient.service instanceof FooMessageService).toBe(true);
         expect(fooClient.service.getMessage()).toBe('foo');
-    });
-
-    // TODO: remove this when inject only accepts tokens
-    xit('should inject dependencies by class', () => {
-
-        @injectable()
-        class MessageClient {
-            // FIXME: this currently throws a NO_PROVIDER error
-            constructor (@inject(FooMessageService) public service: any) {}
-        }
-
-        const injector = new Injector();
-
-        const fooClient = injector.resolve(MessageClient)!;
-
-        expect(fooClient.service).toBeDefined();
-        expect(fooClient.service instanceof BarMessageService).toBe(true);
-        expect(fooClient.service.getFoo()).toBe('bar');
-    });
-
-    // TODO: remove this when inject only accepts tokens
-    xit('should throw on non-injectable dependencies', () => {
-
-        class NonInjectableService {}
-
-        const injectParam = () => {
-
-            @injectable()
-            class MessageClient {
-
-                constructor (@inject(NonInjectableService) public service: any) {}
-            }
-        }
-
-        expect(injectParam).toThrowError(CLASS_NOT_INJECTABLE(NonInjectableService).message);
     });
 });

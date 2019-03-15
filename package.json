@@ -30,6 +30,7 @@
     "postbuild": "npm run docs",
     "pretest": "rimraf ./dev ./coverage",
     "test": "tsc -p tsconfig.dev.json && karma start karma.config.js",
+    "test:debug": "tsc -p tsconfig.dev.json && karma start karma.config.js --browsers debug --no-single-run",
     "test:ci": "tsc -p tsconfig.dev.json && karma start karma.config.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "test:watch": "tsc -w -p tsconfig.dev.json & karma start karma.config.js --auto-watch --no-single-run",
     "predocs": "rimraf ./docs",

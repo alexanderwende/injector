@@ -20,9 +20,15 @@ module.exports = function (config) {
         files: [
             // load the polyfill with @abraham/reflection only once (it uses a WeakMap to store
             // metadata and loading it more than once, will override previous metadata)
-            { pattern: 'dev/polyfill.js', watched: false },
+            {
+                pattern: 'dev/polyfill.js',
+                watched: false
+            },
             // don't watch the spec files, rollup-preprocessor will watch them
-            { pattern: 'dev/**/*.spec.js', watched: false }
+            {
+                pattern: 'dev/**/*.spec.js',
+                watched: false
+            }
         ],
 
 
@@ -117,6 +123,15 @@ module.exports = function (config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['ChromeHeadless'],
+
+
+        customLaunchers: {
+            debug: {
+                base: 'Chrome',
+                flags: ['--remote-debugging-port=9222'],
+                debug: true
+            }
+        },
 
 
         // Continuous Integration mode
