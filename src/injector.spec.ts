@@ -238,6 +238,31 @@ describe('Injector', () => {
         expect(warrior.rest()).toBe('undefined rests: Gulp, gulp, gulp...');
     });
 
+    it('should provide itself', () => {
+
+        @injectable()
+        class Service {
+
+            constructor (public injector: Injector) {}
+        }
+
+        const injector = new Injector();
+
+        expect(injector.resolve(Injector)).toBe(injector);
+
+        const child = new Injector(injector);
+
+        expect(child.resolve(Injector)).toBe(child);
+
+        let service = injector.resolve(Service)!;
+
+        expect(service.injector).toBe(injector);
+
+        service = child.resolve(Service)!;
+
+        expect(service.injector).toBe(child);
+    });
+
     it('can use parent injectors', () => {
 
         const injector = new Injector();

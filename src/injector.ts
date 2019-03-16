@@ -1,7 +1,8 @@
 import { getTokenAnnotation } from './annotations';
 import { InjectToken } from './inject-token';
-import { ClassProvider, Provider } from './providers';
+import { ClassProvider, Provider, ValueProvider } from './providers';
 import { Constructor } from './utils';
+import { injectable } from './decorators';
 
 /**
  * @internal
@@ -15,7 +16,14 @@ export const NO_PROVIDER = (token: InjectToken) => new Error(`No provider has be
 
 /**
  * The injector class
+ *
+ * @remarks
+ * The `Injector` class is a reflective, hierarchical dependency injection container. Reflective means
+ * that it relies on metadata reflection to resolve dependencies. Hierarchical means that it can have
+ * child-containers. Child-containers can provide different dependencies for tokens, but can also look
+ * up tokens from their respective parent-containers.
  */
+@injectable()
 export class Injector {
 
     private _registry: Map<InjectToken<any>, Provider<any>> = new Map();
@@ -39,15 +47,17 @@ export class Injector {
 
         if (parent) this._parent = parent;
 
-        // TODO: add provider for injector instance itself
+        // provide the `Injector` instance itself
+        this.provide(Injector, new ValueProvider(this));
     }
 
     /**
-     * Provide a provider for a dependency to the injector
+     * Register a provider for a dependency to the injector
      *
      * @param constructorOrToken - A class constructor or {@link InjectToken} to provide
      * @param provider - A {@link Provider} which will be used to resolve the class or token
      */
+    // TODO: rename to `register`
     provide<T> (constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>) {
 
         const token: InjectToken<T> | undefined = constructorOrToken instanceof InjectToken
@@ -94,7 +104,7 @@ export class Injector {
         // class was not decorated with @injectable
         if (!token) {
 
-            if(!optional) throw CLASS_NOT_PROVIDABLE(constructorFn);
+            if (!optional) throw CLASS_NOT_PROVIDABLE(constructorFn);
 
             return undefined;
         }
