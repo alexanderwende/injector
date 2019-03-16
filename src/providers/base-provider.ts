@@ -17,20 +17,12 @@ export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with 
  * the factory function's return value. Each of the dependencies will be resolved using an
  * `Injector` instance which must be passed to the provider's {@link provide} method.
  *
- * // TODO: test this
  * ```typescript
  * @injectable()
  * class Foo {}
  *
  * @injectable()
  * class Bar {}
- *
- * interface FooBar {
- *      foo: Foo;
- *      bar: Bar;
- * }
- *
- * const token = new InjectToken<FooBar>('FooBar');
  *
  * const factory = (foo: Foo, bar: Bar) => ({ foo: foo, bar: bar });
  *
@@ -43,11 +35,18 @@ export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with 
  *
  * provider.provide(injector);
  *
- * // or more naturally
+ * // or more naturally...
+ *
+ * interface FooBar {
+ *      foo: Foo;
+ *      bar: Bar;
+ * }
+ *
+ * const token = new InjectToken<FooBar>('FooBar');
  *
  * injector.provide(token, provider);
  *
- * injector.resolve(token);
+ * injector.resolve(token)!;
  * ```
  */
 export class BaseProvider<T> implements Provider<T> {
