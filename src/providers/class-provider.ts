@@ -45,12 +45,12 @@ export class ClassProvider<T> extends BaseProvider<T> {
 
     constructor (
         constructorFn: Constructor<T>,
-        dependencies?: ParameterAnnotations,
+        parameters?: ParameterAnnotations,
         properties?: PropertyAnnotations) {
 
         super(
             createClassFactory(constructorFn),
-            dependencies || getParameterAnnotations(constructorFn),
+            parameters || getParameterAnnotations(constructorFn),
             properties || getPropertyAnnotations(constructorFn)
         );
     }

@@ -14,6 +14,7 @@ export const CLASS_NOT_PROVIDABLE = (constructorFn: Constructor) => new Error(`C
  */
 export const NO_PROVIDER = (token: InjectToken) => new Error(`No provider has been found for the requested token '${ token.description }'.`);
 
+// TODO: update docs
 /**
  * The injector class
  *

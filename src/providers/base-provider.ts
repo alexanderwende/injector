@@ -57,18 +57,19 @@ export class BaseProvider<T> implements Provider<T> {
      * The `BaseProvider` constructor
      *
      * @param factory - The provider's factory function
-     * @param dependencies - The parameter dependencies of the factory function
+     * @param parameters - The parameter dependencies of the factory function
      * @param properties - The property dependencies of the value returned from the factory function
      */
     constructor (
         public factory: Factory<T>,
-        public dependencies: ParameterAnnotations = new Map(),
+        public parameters: ParameterAnnotations = new Map(),
         public properties: PropertyAnnotations = new Map()) { }
 
     /**
      * Get the provider's provided value
      *
      * @param injector - The injector to use to resolve the provider's dependencies
+     * @returns The provider's provided value
      */
     provide (injector?: Injector): T {
 
@@ -76,11 +77,11 @@ export class BaseProvider<T> implements Provider<T> {
 
         if (!injector) throw PROVIDER_UNREGISTERED;
 
-        const dependencies = this.resolveDependencies(injector);
+        const parameters = this.resolveParameters(injector);
 
         const properties = this.resolveProperties(injector);
 
-        return this.createValue(dependencies, properties);
+        return this.createValue(parameters, properties);
     }
 
     /**
@@ -89,11 +90,11 @@ export class BaseProvider<T> implements Provider<T> {
      * @param injector - The current injector that runs the provider
      * @returns An array of resolved parameter dependencies
      */
-    protected resolveDependencies (injector: Injector): any[] {
+    protected resolveParameters (injector: Injector): any[] {
 
         const parameters: any[] = [];
 
-        this.dependencies.forEach(({ token, optional }, index) => parameters[index] = injector.resolve(token, optional));
+        this.parameters.forEach(({ token, optional }, index) => parameters[index] = injector.resolve(token, optional));
 
         return parameters;
     }
@@ -116,13 +117,13 @@ export class BaseProvider<T> implements Provider<T> {
     /**
      * Creates the provider's provided value by invoking the factory
      *
-     * @param dependencies - The parameter dependencies of the factory
+     * @param parameters - The parameter dependencies of the factory
      * @param properties - The property dependencies of the instance returned from the factory
      * @returns The value created by the provider's factory
      */
-    protected createValue (dependencies: any[] = [], properties: any = {}): T {
+    protected createValue (parameters: any[] = [], properties: any = {}): T {
 
-        const value = this.factory(...dependencies);
+        const value = this.factory(...parameters);
 
         return (value instanceof Object) ? Object.assign(value, properties) : value;
     }

@@ -34,9 +34,9 @@ describe('ClassProvider', () => {
 
         const provider = new ClassProvider(FooBar);
 
-        expect(provider.dependencies.get(0)).toBeDefined();
-        expect(provider.dependencies.get(0)!.token).toBe(Foo);
-        expect(provider.dependencies.get(0)!.optional).toBe(false);
+        expect(provider.parameters.get(0)).toBeDefined();
+        expect(provider.parameters.get(0)!.token).toBe(Foo);
+        expect(provider.parameters.get(0)!.optional).toBe(false);
 
         expect(provider.properties.get('bar')).toBeDefined();
         expect(provider.properties.get('bar')!.token).toBe(Bar);
