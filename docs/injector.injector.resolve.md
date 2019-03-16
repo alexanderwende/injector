@@ -14,6 +14,6 @@ resolve<T>(target: Constructor<T> | InjectToken<T>, optional?: boolean): T | und
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `target` | `Constructor<T> | InjectToken<T>` | A class constructor or [InjectToken](./injector.injecttoken.md) to resolve |
+|  `target` | `Constructor<T> | InjectToken<T>` | The class or [InjectToken](./injector.injecttoken.md) to resolve |
 |  `optional` | `boolean` | Should the dependency be optional. If `true` the injector will not throw an error if it cannot resolve the dependency and returns `undefined`<!-- -->. If `false` the injector will throw an error if the dependency cannot be resolved. |
 

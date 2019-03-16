@@ -6,9 +6,9 @@
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [`dependencies`](./injector.provider.dependencies.md) | `ParameterAnnotations` |  |
 |  [`factory`](./injector.provider.factory.md) | `Factory<T>` |  |
 |  [`injector`](./injector.provider.injector.md) | `Injector | undefined` |  |
+|  [`parameters`](./injector.provider.parameters.md) | `ParameterAnnotations` |  |
 |  [`properties`](./injector.provider.properties.md) | `PropertyAnnotations` |  |
 
 ## Methods

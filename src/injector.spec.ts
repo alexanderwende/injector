@@ -1,6 +1,6 @@
 import { inject, injectable, optional } from './decorators';
 import { InjectToken } from './inject-token';
-import { Injector, NO_PROVIDER } from './injector';
+import { Injector, NO_PROVIDER, CLASS_NOT_RESOLVABLE, CLASS_NOT_PROVIDABLE } from './injector';
 import { ClassProvider, SingletonProvider, ValueProvider } from './providers';
 
 describe('Injector', () => {
@@ -100,8 +100,8 @@ describe('Injector', () => {
 
         const injector = new Injector();
 
-        injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
-        injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
+        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
+        injector.register(NAME_TOKEN, new ValueProvider('Clay'));
 
         expect(injector.resolve(WEAPON_TOKEN)! instanceof Sword).toBe(true);
         expect(injector.resolve(WEAPON_TOKEN)!.use()).toBe('Sword strike...');
@@ -113,8 +113,8 @@ describe('Injector', () => {
 
         const injector = new Injector();
 
-        injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
-        injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
+        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
+        injector.register(NAME_TOKEN, new ValueProvider('Clay'));
 
         const warrior = injector.resolve(Warrior)!;
 
@@ -141,8 +141,8 @@ describe('Injector', () => {
 
         const injector = new Injector();
 
-        injector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
-        injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
+        injector.register(WEAPON_TOKEN, new ClassProvider(Revolver));
+        injector.register(NAME_TOKEN, new ValueProvider('Cliff'));
 
         const warrior = injector.resolve(Warrior)!;
 
@@ -159,8 +159,8 @@ describe('Injector', () => {
 
         const injector = new Injector();
 
-        injector.provide(WEAPON_TOKEN, new SingletonProvider(Gun));
-        injector.provide(NAME_TOKEN, new ValueProvider('Smith'));
+        injector.register(WEAPON_TOKEN, new SingletonProvider(Gun));
+        injector.register(NAME_TOKEN, new ValueProvider('Smith'));
 
         const warrior = injector.resolve(Warrior)!;
 
@@ -197,7 +197,7 @@ describe('Injector', () => {
 
         const injector = new Injector();
 
-        injector.provide(MessageService, new SingletonProvider(MessageService));
+        injector.register(MessageService, new SingletonProvider(MessageService));
 
         const client1 = injector.resolve(MessageClient)!;
         const client2 = injector.resolve(MessageClient)!;
@@ -207,25 +207,53 @@ describe('Injector', () => {
         expect(client1.service).toBe(client2.service);
     });
 
-    it('should throw exception on missing dependencies', () => {
+    it('should throw if no provider is registered', () => {
+
+        const token = new InjectToken<string>('token');
 
         const injector = new Injector();
 
-        injector.provide(NAME_TOKEN, new ValueProvider('Cliff'));
+        const resolve = () => {
+
+            injector.resolve(token);
+        };
+
+        expect(resolve).toThrowError(NO_PROVIDER(token).message);
+    });
+
+    it('should throw if class cannot be resolved', () => {
+
+        class MessageClient {}
+
+        const injector = new Injector();
 
         const resolve = () => {
 
-            injector.resolve(Warrior);
+            injector.resolve(MessageClient);
         };
 
-        expect(resolve).toThrowError(NO_PROVIDER(WEAPON_TOKEN).message);
+        expect(resolve).toThrowError(CLASS_NOT_RESOLVABLE(MessageClient).message);
+    });
+
+    it('should throw when registering a provider for a class which is not providable', () => {
+
+        class MessageClient {}
+
+        const injector = new Injector();
+
+        const register = () => {
+
+            injector.register(MessageClient, new ClassProvider(MessageClient));
+        };
+
+        expect(register).toThrowError(CLASS_NOT_PROVIDABLE(MessageClient).message);
     });
 
     it('should pass undefined for optional missing dependency', () => {
 
         const injector = new Injector();
 
-        injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
+        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
 
         const warrior = injector.resolve(Warrior)!;
 
@@ -268,8 +296,8 @@ describe('Injector', () => {
         const injector = new Injector();
 
         // we set up the root injector
-        injector.provide(WEAPON_TOKEN, new ClassProvider(Sword));
-        injector.provide(NAME_TOKEN, new ValueProvider('Clay'));
+        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
+        injector.register(NAME_TOKEN, new ValueProvider('Clay'));
 
         const warrior = injector.resolve(Warrior)!;
 
@@ -287,8 +315,8 @@ describe('Injector', () => {
         expect(warrior2.drink instanceof Water).toBe(true);
 
         // we configure the child injector
-        childInjector.provide(WEAPON_TOKEN, new ClassProvider(Revolver));
-        childInjector.provide(NAME_TOKEN, new ValueProvider('John'));
+        childInjector.register(WEAPON_TOKEN, new ClassProvider(Revolver));
+        childInjector.register(NAME_TOKEN, new ValueProvider('John'));
 
         const warrior3 = childInjector.resolve(Warrior)!;
 

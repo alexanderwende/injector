@@ -6,7 +6,7 @@ Constructs a new instance of the [ClassProvider](./injector.classprovider.md) cl
 
 **Signature:**
 ```javascript
-constructor(constructorFn: Constructor<T>, dependencies?: ParameterAnnotations, properties?: PropertyAnnotations);
+constructor(constructorFn: Constructor<T>, parameters?: ParameterAnnotations, properties?: PropertyAnnotations);
 ```
 
 ## Parameters
@@ -14,6 +14,6 @@ constructor(constructorFn: Constructor<T>, dependencies?: ParameterAnnotations, 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  `constructorFn` | `Constructor<T>` |  |
-|  `dependencies` | `ParameterAnnotations` |  |
+|  `parameters` | `ParameterAnnotations` |  |
 |  `properties` | `PropertyAnnotations` |  |
 

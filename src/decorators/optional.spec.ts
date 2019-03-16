@@ -29,7 +29,7 @@ describe('@optional', () => {
         answerMessages: boolean;
     }
 
-    // an InjectToken for an interface which we won't provide
+    // an InjectToken for an interface which we won't register
     const CONFIG = new InjectToken<MessageClientConfig>('MessageClientConfig');
 
     it('should resolve optional dependencies', () => {
@@ -52,7 +52,7 @@ describe('@optional', () => {
 
         const injector = new Injector();
 
-        injector.provide(CONFIG, new ValueProvider({ checkMessages: true, answerMessages: false }));
+        injector.register(CONFIG, new ValueProvider({ checkMessages: true, answerMessages: false }));
 
         const client = injector.resolve(MessageClient)!;
 

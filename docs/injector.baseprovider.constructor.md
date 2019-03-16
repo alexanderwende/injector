@@ -6,7 +6,7 @@ The `BaseProvider` constructor
 
 **Signature:**
 ```javascript
-constructor(factory: Factory<T>, dependencies?: ParameterAnnotations, properties?: PropertyAnnotations);
+constructor(factory: Factory<T>, parameters?: ParameterAnnotations, properties?: PropertyAnnotations);
 ```
 
 ## Parameters
@@ -14,6 +14,6 @@ constructor(factory: Factory<T>, dependencies?: ParameterAnnotations, properties
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  `factory` | `Factory<T>` | The provider's factory function |
-|  `dependencies` | `ParameterAnnotations` | The parameter dependencies of the factory function |
+|  `parameters` | `ParameterAnnotations` | The parameter dependencies of the factory function |
 |  `properties` | `PropertyAnnotations` | The property dependencies of the value returned from the factory function |
 

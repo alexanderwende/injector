@@ -7,11 +7,11 @@
 |  Class | Description |
 |  --- | --- |
 |  [`BaseProvider`](./injector.baseprovider.md) | The `BaseProvider` class |
-|  [`ClassProvider`](./injector.classprovider.md) |  |
+|  [`ClassProvider`](./injector.classprovider.md) | A provider for class instances |
 |  [`Injector`](./injector.injector.md) | The injector class |
 |  [`InjectToken`](./injector.injecttoken.md) | A token that represents a dependency |
-|  [`SingletonProvider`](./injector.singletonprovider.md) |  |
-|  [`ValueProvider`](./injector.valueprovider.md) |  |
+|  [`SingletonProvider`](./injector.singletonprovider.md) | A provider for singleton class instances |
+|  [`ValueProvider`](./injector.valueprovider.md) | A provider for static values |
 
 ## Interfaces
 

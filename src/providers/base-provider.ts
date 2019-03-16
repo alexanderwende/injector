@@ -44,7 +44,7 @@ export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with 
  *
  * const token = new InjectToken<FooBar>('FooBar');
  *
- * injector.provide(token, provider);
+ * injector.register(token, provider);
  *
  * injector.resolve(token)!;
  * ```

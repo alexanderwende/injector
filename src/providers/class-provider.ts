@@ -36,7 +36,7 @@ import { BaseProvider } from './base-provider';
  * const provider = new ClassProvider(FooBar);
  * const injector = new Injector();
  *
- * injector.provide(FooBar, provider);
+ * injector.register(FooBar, provider);
  *
  * const fooBar = injector.resolve(FooBar)!;
  * ```

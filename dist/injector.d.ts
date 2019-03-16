@@ -8,9 +8,19 @@ export declare const CLASS_NOT_PROVIDABLE: (constructorFn: Constructor<any>) => 
 /**
  * @internal
  */
+export declare const CLASS_NOT_RESOLVABLE: (constructorFn: Constructor<any>) => Error;
+/**
+ * @internal
+ */
 export declare const NO_PROVIDER: (token: InjectToken<any>) => Error;
 /**
  * The injector class
+ *
+ * @remarks
+ * The `Injector` class is a reflective, hierarchical dependency injection container. Reflective means
+ * that it relies on metadata reflection to resolve dependencies. Hierarchical means that it can have
+ * child-containers. Child-containers can register different providers for tokens, but can also look
+ * up tokens from their respective parent-containers.
  */
 export declare class Injector {
     private _registry;
@@ -30,17 +40,19 @@ export declare class Injector {
      */
     constructor(parent?: Injector);
     /**
-     * Provide a provider for a dependency to the injector
+     * Register a provider for a dependency with the injector
      *
-     * @param constructorOrToken - A class constructor or {@link InjectToken} to provide
-     * @param provider - A {@link Provider} which will be used to resolve the class or token
+     * @param constructorOrToken - The class or {@link InjectToken} for which to register a provider for
+     * @param provider - The {@link Provider} which will be used to resolve the class or token
      */
-    provide<T>(constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>): void;
+    register<T>(constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>): void;
     /**
      * Resolve a dependency
      *
-     * @param target - A class constructor or {@link InjectToken} to resolve
-     * @param optional - Should the dependency be optional. If `true` the injector will not throw an error if it cannot resolve the dependency and returns `undefined`. If `false` the injector will throw an error if the dependency cannot be resolved.
+     * @param target - The class or {@link InjectToken} to resolve
+     * @param optional - Should the dependency be optional. If `true` the injector will not throw an
+     * error if it cannot resolve the dependency and returns `undefined`. If `false` the injector will
+     * throw an error if the dependency cannot be resolved.
      */
     resolve<T>(target: Constructor<T> | InjectToken<T>, optional?: boolean): T | undefined;
     /**

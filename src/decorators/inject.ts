@@ -59,9 +59,9 @@ import { Constructor } from '../utils';
  * // create an `Injector` instance
  * const injector = new Injector();
  *
- * // tell the injector how to provide the MESSAGE_SERVICE token
+ * // tell the injector how to resolve the MESSAGE_SERVICE token
  * // we are using a `ClassProvider` here, but we could use other providers as well
- * injector.provide(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
+ * injector.register(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
  * ```
  *
  * @param injectToken - An {@link InjectToken} identifying the dependency to inject

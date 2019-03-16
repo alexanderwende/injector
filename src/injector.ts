@@ -7,12 +7,20 @@ import { injectable } from './decorators';
 /**
  * @internal
  */
-export const CLASS_NOT_PROVIDABLE = (constructorFn: Constructor) => new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be resolved.`);
+export const CLASS_NOT_PROVIDABLE = (constructorFn: Constructor) =>
+    new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be provided.`);
 
 /**
  * @internal
  */
-export const NO_PROVIDER = (token: InjectToken) => new Error(`No provider has been found for the requested token '${ token.description }'.`);
+export const CLASS_NOT_RESOLVABLE = (constructorFn: Constructor) =>
+    new Error(`Class '${ constructorFn.name }' has not been decorated as injectable and cannot be resolved.`);
+
+/**
+ * @internal
+ */
+export const NO_PROVIDER = (token: InjectToken) =>
+    new Error(`No provider has been found for the requested token '${ token.description }'.`);
 
 // TODO: update docs
 /**
@@ -21,7 +29,7 @@ export const NO_PROVIDER = (token: InjectToken) => new Error(`No provider has be
  * @remarks
  * The `Injector` class is a reflective, hierarchical dependency injection container. Reflective means
  * that it relies on metadata reflection to resolve dependencies. Hierarchical means that it can have
- * child-containers. Child-containers can provide different dependencies for tokens, but can also look
+ * child-containers. Child-containers can register different providers for tokens, but can also look
  * up tokens from their respective parent-containers.
  */
 @injectable()
@@ -48,18 +56,17 @@ export class Injector {
 
         if (parent) this._parent = parent;
 
-        // provide the `Injector` instance itself
-        this.provide(Injector, new ValueProvider(this));
+        // register the `Injector` instance itself
+        this.register(Injector, new ValueProvider(this));
     }
 
     /**
-     * Register a provider for a dependency to the injector
+     * Register a provider for a dependency with the injector
      *
-     * @param constructorOrToken - A class constructor or {@link InjectToken} to provide
-     * @param provider - A {@link Provider} which will be used to resolve the class or token
+     * @param constructorOrToken - The class or {@link InjectToken} for which to register a provider for
+     * @param provider - The {@link Provider} which will be used to resolve the class or token
      */
-    // TODO: rename to `register`
-    provide<T> (constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>) {
+    register<T> (constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provider<T>) {
 
         const token: InjectToken<T> | undefined = constructorOrToken instanceof InjectToken
             ? constructorOrToken
@@ -76,8 +83,10 @@ export class Injector {
     /**
      * Resolve a dependency
      *
-     * @param target - A class constructor or {@link InjectToken} to resolve
-     * @param optional - Should the dependency be optional. If `true` the injector will not throw an error if it cannot resolve the dependency and returns `undefined`. If `false` the injector will throw an error if the dependency cannot be resolved.
+     * @param target - The class or {@link InjectToken} to resolve
+     * @param optional - Should the dependency be optional. If `true` the injector will not throw an
+     * error if it cannot resolve the dependency and returns `undefined`. If `false` the injector will
+     * throw an error if the dependency cannot be resolved.
      */
     resolve<T> (target: Constructor<T> | InjectToken<T>, optional = false): T | undefined {
 
@@ -102,10 +111,10 @@ export class Injector {
 
         const token: InjectToken<T> | undefined = getTokenAnnotation(constructorFn);
 
-        // class was not decorated with @injectable
+        // class was not decorated with @injectable, throw if not optional
         if (!token) {
 
-            if (!optional) throw CLASS_NOT_PROVIDABLE(constructorFn);
+            if (!optional) throw CLASS_NOT_RESOLVABLE(constructorFn);
 
             return undefined;
         }
@@ -113,7 +122,7 @@ export class Injector {
         // class has no provider yet, we create one
         if (!this._getProvider(token)) {
 
-            this.provide(token, new ClassProvider(constructorFn));
+            this.register(token, new ClassProvider(constructorFn));
         }
 
         return this._resolveToken(token, optional);
@@ -126,6 +135,7 @@ export class Injector {
 
         const provider = this._getProvider(token);
 
+        // token has no provider, throw if not optional
         if (!provider) {
 
             if (!optional) throw NO_PROVIDER(token);

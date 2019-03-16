@@ -20,7 +20,7 @@ import { BaseProvider } from './base-provider';
  *
  * const injector = new injector();
  *
- * injector.provide(token, new ValueProvider(CONFIG));
+ * injector.register(token, new ValueProvider(CONFIG));
  *
  * injector.resolve(token)!; // --> { receiveMessages: true, answerMessages: false, channelId: 'some_id' }
  * ```

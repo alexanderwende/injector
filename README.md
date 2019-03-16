@@ -167,9 +167,9 @@ class MessageClient {
 // create an `Injector` instance
 const injector = new Injector();
 
-// tell the injector how to provide the MESSAGE_SERVICE token
+// tell the injector how to resolve the MESSAGE_SERVICE token
 // we are using a `ClassProvider` here, but we could use other providers as well
-injector.provide(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
+injector.register(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
 
 // create instances by letting the `Injector` resolve them
 const client = injector.resolve(MessageClient)!;
@@ -196,7 +196,7 @@ interface MessageClientConfig {
     answerMessages: boolean;
 }
 
-// an InjectToken for an interface which we won't provide
+// an InjectToken for an interface which we won't register
 const CONFIG = new InjectToken<MessageClientConfig>('MessageClientConfig');
 
 @injectable()

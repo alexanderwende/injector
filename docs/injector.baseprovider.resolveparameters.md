@@ -1,12 +1,12 @@
-[Home](./index) &gt; [injector](./injector.md) &gt; [BaseProvider](./injector.baseprovider.md) &gt; [resolveDependencies](./injector.baseprovider.resolvedependencies.md)
+[Home](./index) &gt; [injector](./injector.md) &gt; [BaseProvider](./injector.baseprovider.md) &gt; [resolveParameters](./injector.baseprovider.resolveparameters.md)
 
-# BaseProvider.resolveDependencies method
+# BaseProvider.resolveParameters method
 
 Resolves the parameter dependencies for the factory from the current injector
 
 **Signature:**
 ```javascript
-protected resolveDependencies(injector: Injector): any[];
+protected resolveParameters(injector: Injector): any[];
 ```
 **Returns:** `any[]`
 

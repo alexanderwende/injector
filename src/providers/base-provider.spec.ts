@@ -27,7 +27,7 @@ describe('BaseProvider', () => {
 
         const token = new InjectToken('foo');
 
-        injector.provide(token, provider);
+        injector.register(token, provider);
 
         // provider should use the injector it is registered with
         expect(provider.provide()).toBe('foo');
@@ -74,7 +74,7 @@ describe('BaseProvider', () => {
 
         const token = new InjectToken<any>('FooBar');
 
-        injector.provide(token, provider);
+        injector.register(token, provider);
 
         result = injector.resolve(token)!;
 

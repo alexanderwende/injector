@@ -4,7 +4,7 @@ import { Injector } from '../injector';
 export interface Provider<T> {
     injector: Injector | undefined;
     factory: Factory<T>;
-    dependencies: ParameterAnnotations;
+    parameters: ParameterAnnotations;
     properties: PropertyAnnotations;
     provide(injector?: Injector): T;
 }

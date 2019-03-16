@@ -18,7 +18,7 @@ A token that represents a dependency
 
 ## Remarks
 
-An [InjectToken](./injector.injecttoken.md) should be used to inject any type, which does not have a runtime representation, e.g. an interface, callable type or a plain value. An [InjectToken](./injector.injecttoken.md) is tied to a [Provider](./injector.provider.md) using the [Injector.provide](./injector.injector.provide.md) method.
+An [InjectToken](./injector.injecttoken.md) should be used to inject any type, which does not have a runtime representation, e.g. an interface, callable type or a plain value. An [InjectToken](./injector.injecttoken.md) is tied to a [Provider](./injector.provider.md) using the [Injector.register](./injector.injector.register.md) method.
 ```javascript
 interface MessageService {
      getMessage (): string;
@@ -39,8 +39,8 @@ const CONFIG = new InjectToken<MessageClientConfig>('MessageClientConfig');
 
 const injector = new Injector();
 
-injector.provide(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
-injector.provide(CONFIG, new ValueProvider({ checkMessages: true, answerMessages: false }));
+injector.register(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
+injector.register(CONFIG, new ValueProvider({ checkMessages: true, answerMessages: false }));
 
 injector.resolve(MESSAGE_SERVICE).getMessage(); // --> 'foo'
 injector.resolve(CONFIG); // --> { checkMessages: true, answerMessages: false }

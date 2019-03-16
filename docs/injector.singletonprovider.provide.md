@@ -5,7 +5,13 @@
 
 **Signature:**
 ```javascript
-provide(): T;
+provide(injector?: Injector): T;
 ```
 **Returns:** `T`
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  `injector` | `Injector` |  |
 

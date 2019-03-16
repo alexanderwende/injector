@@ -15,20 +15,12 @@ export declare const PROVIDER_UNREGISTERED: Error;
  * the factory function's return value. Each of the dependencies will be resolved using an
  * `Injector` instance which must be passed to the provider's {@link provide} method.
  *
- * // TODO: test this
  * ```typescript
  * @injectable()
  * class Foo {}
  *
  * @injectable()
  * class Bar {}
- *
- * interface FooBar {
- *      foo: Foo;
- *      bar: Bar;
- * }
- *
- * const token = new InjectToken<FooBar>('FooBar');
  *
  * const factory = (foo: Foo, bar: Bar) => ({ foo: foo, bar: bar });
  *
@@ -41,30 +33,38 @@ export declare const PROVIDER_UNREGISTERED: Error;
  *
  * provider.provide(injector);
  *
- * // or more naturally
+ * // or more naturally...
  *
- * injector.provide(token, provider);
+ * interface FooBar {
+ *      foo: Foo;
+ *      bar: Bar;
+ * }
  *
- * injector.resolve(token);
+ * const token = new InjectToken<FooBar>('FooBar');
+ *
+ * injector.register(token, provider);
+ *
+ * injector.resolve(token)!;
  * ```
  */
 export declare class BaseProvider<T> implements Provider<T> {
     factory: Factory<T>;
-    dependencies: ParameterAnnotations;
+    parameters: ParameterAnnotations;
     properties: PropertyAnnotations;
     injector: Injector | undefined;
     /**
      * The `BaseProvider` constructor
      *
      * @param factory - The provider's factory function
-     * @param dependencies - The parameter dependencies of the factory function
+     * @param parameters - The parameter dependencies of the factory function
      * @param properties - The property dependencies of the value returned from the factory function
      */
-    constructor(factory: Factory<T>, dependencies?: ParameterAnnotations, properties?: PropertyAnnotations);
+    constructor(factory: Factory<T>, parameters?: ParameterAnnotations, properties?: PropertyAnnotations);
     /**
      * Get the provider's provided value
      *
      * @param injector - The injector to use to resolve the provider's dependencies
+     * @returns The provider's provided value
      */
     provide(injector?: Injector): T;
     /**
@@ -73,7 +73,7 @@ export declare class BaseProvider<T> implements Provider<T> {
      * @param injector - The current injector that runs the provider
      * @returns An array of resolved parameter dependencies
      */
-    protected resolveDependencies(injector: Injector): any[];
+    protected resolveParameters(injector: Injector): any[];
     /**
      * Resolves the property dependencies for the factory from the current injector
      *
@@ -84,10 +84,10 @@ export declare class BaseProvider<T> implements Provider<T> {
     /**
      * Creates the provider's provided value by invoking the factory
      *
-     * @param dependencies - The parameter dependencies of the factory
+     * @param parameters - The parameter dependencies of the factory
      * @param properties - The property dependencies of the instance returned from the factory
      * @returns The value created by the provider's factory
      */
-    protected createValue(dependencies?: any[], properties?: any): T;
+    protected createValue(parameters?: any[], properties?: any): T;
 }
 //# sourceMappingURL=base-provider.d.ts.map

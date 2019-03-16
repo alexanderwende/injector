@@ -44,7 +44,7 @@ describe('ClassProvider', () => {
 
         const injector = new Injector();
 
-        injector.provide(FooBar, provider);
+        injector.register(FooBar, provider);
 
         const result = injector.resolve(FooBar)!;
 

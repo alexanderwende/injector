@@ -2,6 +2,8 @@
 
 # SingletonProvider class
 
+A provider for singleton class instances
+
 ## Properties
 
 |  Property | Access Modifier | Type | Description |
@@ -12,5 +14,8 @@
 
 |  Method | Access Modifier | Returns | Description |
 |  --- | --- | --- | --- |
-|  [`provide()`](./injector.singletonprovider.provide.md) |  | `T` |  |
+|  [`provide(injector)`](./injector.singletonprovider.provide.md) |  | `T` |  |
 
+## Remarks
+
+The `SingletonProvidr` caches the first instance of a class it creates and subsequently returns the cached instance instead of creating new instances.

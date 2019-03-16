@@ -10,6 +10,8 @@ provide(injector?: Injector): T;
 ```
 **Returns:** `T`
 
+The provider's provided value
+
 ## Parameters
 
 |  Parameter | Type | Description |

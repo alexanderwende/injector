@@ -4,7 +4,7 @@
  * @remarks
  * An {@link InjectToken} should be used to inject any type, which does not have a runtime
  * representation, e.g. an interface, callable type or a plain value. An {@link InjectToken}
- * is tied to a {@link Provider} using the {@link Injector.provide} method.
+ * is tied to a {@link Provider} using the {@link Injector.register} method.
  *
  * ```typescript
  * interface MessageService {
@@ -26,8 +26,8 @@
  *
  * const injector = new Injector();
  *
- * injector.provide(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
- * injector.provide(CONFIG, new ValueProvider({ checkMessages: true, answerMessages: false }));
+ * injector.register(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
+ * injector.register(CONFIG, new ValueProvider({ checkMessages: true, answerMessages: false }));
  *
  * injector.resolve(MESSAGE_SERVICE).getMessage(); // --> 'foo'
  * injector.resolve(CONFIG); // --> { checkMessages: true, answerMessages: false }
