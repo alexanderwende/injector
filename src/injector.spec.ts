@@ -192,7 +192,7 @@ describe('Injector', () => {
         @injectable()
         class MessageClient {
 
-            constructor (public service: MessageService) {}
+            constructor (public service: MessageService) { }
         }
 
         const injector = new Injector();
@@ -223,7 +223,7 @@ describe('Injector', () => {
 
     it('should throw if class cannot be resolved', () => {
 
-        class MessageClient {}
+        class MessageClient { }
 
         const injector = new Injector();
 
@@ -237,7 +237,7 @@ describe('Injector', () => {
 
     it('should throw when registering a provider for a class which is not providable', () => {
 
-        class MessageClient {}
+        class MessageClient { }
 
         const injector = new Injector();
 
@@ -271,7 +271,7 @@ describe('Injector', () => {
         @injectable()
         class Service {
 
-            constructor (public injector: Injector) {}
+            constructor (public injector: Injector) { }
         }
 
         const injector = new Injector();
@@ -327,5 +327,106 @@ describe('Injector', () => {
         expect(warrior3.fight(true)).toBe('John fights: Revolver shot...');
         expect(warrior3.fight()).toBe('John fights: Fist punch...');
         expect(warrior3.rest()).toBe('John rests: Gulp, gulp, gulp...');
+    });
+
+    it('should be able to use hierarchical injectors', () => {
+
+        interface User {
+            username: string;
+        }
+
+        interface MessageService {
+            sendMessage (message: string, user: User): void;
+        }
+
+        // we always need an InjectToken to inject an interface
+        const USER = new InjectToken<User>('User');
+        const MESSAGE_SERVICE = new InjectToken<MessageService>('MessageService');
+
+        @injectable()
+        class NoopMessageService implements MessageService {
+            sendMessage (message: string, user: User) { }
+        }
+
+        @injectable()
+        class FacebookMessageService implements MessageService {
+            sendMessage (message: string, user: User) { }
+        }
+
+        @injectable()
+        class TwitterMessageService implements MessageService {
+            sendMessage (message: string, user: User) { }
+        }
+
+        @injectable()
+        class MessageClient {
+            constructor (
+                @inject(MESSAGE_SERVICE) public service: MessageService,
+                @inject(USER) public user: User) { }
+        }
+
+        // this is a self-contained module which creates its own child injector
+        @injectable()
+        class FacebookMessageModule {
+            // the child injector of the module
+            private injector: Injector;
+            // the message client of the module
+            public client: MessageClient;
+
+            // the parent injector will inject itself into the constructor
+            constructor (parentInjector: Injector) {
+                // we create the child injector inside the module
+                this.injector = new Injector(parentInjector);
+                // we register the appropriate provider for the MESSAGE_SERVICE token
+                this.injector.register(MESSAGE_SERVICE, new ClassProvider(FacebookMessageService));
+                // we resolve the message client through the child injector
+                this.client = this.injector.resolve(MessageClient)!;
+            }
+        }
+
+        // this is a module which needs to be resolved from a child injector
+        @injectable()
+        class TwitterMessageModule {
+            constructor (public client: MessageClient) {}
+        }
+
+        // this will be the parent injector
+        const rootInjector = new Injector();
+
+        // we can register the USER token with the parent injector
+        rootInjector.register(USER, new ValueProvider({ username: 'john' }));
+        // we can also register the NoopMessageService with the parent injector
+        rootInjector.register(MESSAGE_SERVICE, new ClassProvider(NoopMessageService));
+
+        // we create a child injector for the twitter module by passing the rootInjector
+        // as a constructor argument - this sets up the parent-child relationship
+        const twitterInjector = new Injector(rootInjector);
+
+        // on the child injector, we register the appropriate message service implementation
+        twitterInjector.register(MESSAGE_SERVICE, new ClassProvider(TwitterMessageService));
+
+        // now we can resolve our twitter module from the child injector
+        const twitterModule = twitterInjector.resolve(TwitterMessageModule)!;
+
+        // our facebook module is self-contained and can be resolved from the root injector
+        // an implementation like this is preferrable, as it is better decoupled
+        const facebookModule = rootInjector.resolve(FacebookMessageModule)!;
+
+        // we can also resolve a generic client from the root injector
+        const defaultClient = rootInjector.resolve(MessageClient)!;
+
+        expect(defaultClient instanceof MessageClient).toBe(true);
+        expect(defaultClient.service instanceof NoopMessageService).toBe(true);
+        expect(defaultClient.user.username).toBe('john');
+
+        expect(facebookModule instanceof FacebookMessageModule).toBe(true);
+        expect(facebookModule.client instanceof MessageClient).toBe(true);
+        expect(facebookModule.client.service instanceof FacebookMessageService).toBe(true);
+        expect(facebookModule.client.user.username).toBe('john');
+
+        expect(twitterModule instanceof TwitterMessageModule).toBe(true);
+        expect(twitterModule.client instanceof MessageClient).toBe(true);
+        expect(twitterModule.client.service instanceof TwitterMessageService).toBe(true);
+        expect(twitterModule.client.user.username).toBe('john');
     });
 });

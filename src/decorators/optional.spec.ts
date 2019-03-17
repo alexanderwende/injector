@@ -78,8 +78,8 @@ describe('@optional', () => {
             constructor (
                 // BarMessageService is not injectable, by marking it as optional we can prevent an error
                 @optional() public service?: BarMesageService,
-                // CONFIG has no provider, by marking it as optional we can prevent an error
-                @optional() @inject(CONFIG) public config?: MessageClientConfig
+                // MessageClientConfig is just an interface, by marking it as optional we can prevent an error
+                @optional() public config?: MessageClientConfig
             ) { }
         }
 
@@ -96,10 +96,12 @@ describe('@optional', () => {
         @injectable()
         class MessageClient {
 
+            // CONFIG has no provider, by marking it as optional we can prevent an error
             @optional()
             @inject(CONFIG)
             config?: MessageClientConfig;
 
+            // BarMessageService is not injectable, by marking it as optional we can prevent an error
             @optional()
             @inject()
             service?: BarMesageService;

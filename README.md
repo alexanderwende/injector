@@ -225,3 +225,136 @@ const client = injector.resolve(MessageClient)!;
 ### Provider
 
 ### Factory
+
+### Concepts
+
+`Injector` is a reflective, hierarchical dependency injection container. Reflective means that it relies on reflection to identify and resolve dependencies. Hierarchical means that multiple `Injector` instances can co-exist in a hierarchical relation at different levels of an application.
+
+#### Reflection
+
+In order for a dependency injection container to resolve a class - or any dependency - the container needs knowledge about the dependencies of that class. The dependencies themselves can be classes and have their own dependencies. A dependency injection container needs to know the entire dependency graph of a given dependency in order to resolve it. 
+
+
+One way to solve this problem is to explicitly provide the dependency graph to the container through configuration. There are some drawbacks with that approach though:
+
+ 1. It creates boilerplate
+ 2. It's not DRY - it duplicates information that already exists (a class's constructor already defines its parameters explicitly)
+ 3. It's hard to maintain (if you change a constructor's signature you have to remember to update the dependency graph as well)
+
+Another way to solve this problem is to generate the dependency graph at runtime with the help of reflection. Reflection is the ability of a program to examine, introspect and modify its own structure and behavior. In the context of dependency injection it means that the container is able to gain knowledge about how to resolve a dependency by examining the dependency itself. The key benefits of using reflection are:
+
+ 1. Less boilerplate - no unnecessary configuration
+ 2. Your code remains DRY (dependencies can be directly inferred from a class's constructor)
+ 3. It's easier to maintain (changing a constructor's signature will generate a new dependency graph at runtime)
+
+`Injector` makes use of reflection in multiple ways. Let's illustrate this with an example:
+
+```typescript
+@injectable()
+class Service {}
+
+@injectable()
+class Configuration {}
+
+@injectable()
+class Client {
+    constructor (
+        private service: Service, 
+        private config: Configuration) { ... }
+}
+
+const injector = new Injector();
+const client = injector.resolve(Client)!;
+```
+
+`Injector` is capable of resolving an instance of `Client` by using reflection to examine the types of `Client`'s constructor parameters - or dependencies so to speak. It does that with the help of TypeScript's `emitDecoratorMetadata` compiler option. If set to `true` TypeScript will store references to the constructor parameters' respective classes in `Client`'s metadata. `Injector` will read this metadata and create the necessary dependencies in order to create a `Client` instance.
+
+`Injector` also uses reflection to modify aspects of a class's dependencies with the help of decorators. Let's see another example:
+
+```typescript
+interface Configuration { ... }
+
+@injectable()
+class Client {
+    constructor (@optional() private config?: Configuration) { ... }
+}
+
+const injector = new Injector();
+const client = injector.resolve(Client)!;
+```
+
+In this example we don't have a class for `Client`'s dependency - only an interface. Interfaces don't exist at runtime, hence, they cannot be instantiated. `Injector` would not be able to resolve `Client`'s dependency and throw an error. However, by using the `@optional()` decorator, we can modify `Client`'s dependency and let `Injector` know, that this dependency is not required and can be resolved with `undefined` if it cannot be resolved otherwise. The `@optional()` decorator stores this information in `Client`'s metadata as well, for `Injector` to read. The key advantage here is that the decorator can be applied directly to the constructor parameter. All the information about `Client`'s dependency is in one place: The constructor.
+
+#### Hierarchy
+
+`Injector` employs a hierarchical design in order to allow for a couple of interesting use cases. Generally speaking, hierarchical design means that an instance of `Injector` can be related to another instance in a parent-child relationship. This is especially useful in modular application architectures. Let's look at an example:
+
+```typescript
+interface User {
+    username: string;
+}
+
+interface MessageService {
+    sendMessage (message: string, user: User): void;
+}
+
+// we always need an InjectToken to inject an interface
+const USER = new InjectToken<User>('User');
+const MESSAGE_SERVICE = new InjectToken<MessageService>('MessageService');
+
+@injectable()
+class FacebookMessageService implements MessageService {
+    sendMessage (message: string, user: User) { ... }
+}
+
+@injectable()
+class TwitterMessageService implements MessageService {
+    sendMessage (message: string, user: User) { ... }
+}
+
+@injectable()
+class MessageClient {
+    constructor (
+        @inject(MESSAGE_SERVICE) public service: MessageService, 
+        @inject(USER) public user: User) { ... }
+}
+```
+
+In the example above, we have a `MessageClient` that depends on a `MessageService` in order to send messages. Furthermore, we have two classes implementing the `MessageService` interface. We know intuitively that we can use the same `MessageClient` implementation to send messages via Facebook or Twitter by simply creating a `MessageClient` instance with the appropriate `MessageService` implementation passed into the client's constructor. 
+
+In addition, the client depends on a `User` which is needed to send a message. The `User` is the same for either `MessageService` implementation. This is where the hierarchical design of `Injector` comes in. Imagine we want to build a Facebook message module and a Twitter message module that both share the same `User`. We can easily do this using child injectors:
+
+```typescript
+@injectable()
+class FacebookMessageModule {
+    // the child injector of the module
+    private injector: Injector;
+    // the message client of the module
+    public client: MessageClient;
+    
+    // the parent injector will inject itself into the constructor
+    constructor (parentInjector: Injector) {
+        // we create the child injector inside the module
+        this.injector = new Injector(parentInjector);
+        // we register the appropriate provider for the MESSAGE_SERVICE token
+        // in the twitter module, we would provide the TwitterMessageService here
+        this.injector.register(MESSAGE_SERVICE, new ClassProvider(FacebookMessageService));
+        // we resolve the message client through the child injector
+        this.client = this.injector.resolve(MessageClient)!;
+    }
+}
+
+// this will be the parent injector
+const rootInjector = new Injector();
+
+// we can register the USER token with the parent injector
+rootInjector.register(USER, new ValueProvider({ username: 'john' }));
+
+// our facebook module is self-contained and can be resolved from the root injector
+// an implementation like this provides strong decoupling
+const facebookModule = rootInjector.resolve(FacebookMessageModule)!;
+```
+
+The example shows how we can effectively use parent- and child-injectors. The implementation of the `TwitterMessageModule` has been left out intentionally for brevity. The key point is that dependencies that remain the same throughout different application levels can be set up on a root injector. Child injectors don't need to register providers for dependencies which are already registered on a parent injector (like the provider for the `USER` token in the example). Instead, a child injector will walk up its parent injectors to resolve a dependency that it can't resolve itself. It will always chose to resolve a dependency from the closest parent injector which has a matching registered provider. This allows for deeply nested modular design.
+
+On the other hand, a child injector can register providers for dependencies which don't exist on any of its parent injectors (just like the provider for the `MESSAGE_SERVICE` token in the example above). Or it can chose to override a parent injector's provider by registering a different one. This allows your application to stay decoupled, as your parent modules don't need to know about the dependencies of your child modules. Instead, your child modules can define their own dependencies with child injectors.
