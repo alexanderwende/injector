@@ -4,8 +4,6 @@ import { ClassProvider, Provider, ValueProvider } from './providers';
 import { Constructor } from './utils';
 import { injectable } from './decorators';
 
-// TODO: make an example with a separate injector.config.ts
-
 /**
  * @internal
  */

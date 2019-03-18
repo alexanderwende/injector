@@ -23,6 +23,7 @@
     "emitDecoratorMetadata": true
   },
   "include": [
+    "example/**/*.ts",
     "src/**/*.ts"
   ],
   "exclude": [

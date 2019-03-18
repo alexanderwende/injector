@@ -17,10 +17,8 @@ export declare const NO_PROVIDER: (token: InjectToken<any>) => Error;
  * The injector class
  *
  * @remarks
- * The `Injector` class is a reflective, hierarchical dependency injection container. Reflective means
- * that it relies on metadata reflection to resolve dependencies. Hierarchical means that it can have
- * child-containers. Child-containers can register different providers for tokens, but can also look
- * up tokens from their respective parent-containers.
+ * - can provide itself
+ * - can create child injectors
  */
 export declare class Injector {
     private _registry;

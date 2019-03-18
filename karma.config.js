@@ -21,7 +21,7 @@ module.exports = function (config) {
             // load the polyfill with @abraham/reflection only once (it uses a WeakMap to store
             // metadata and loading it more than once, will override previous metadata)
             {
-                pattern: 'dev/polyfill.js',
+                pattern: 'dev/src/polyfill.js',
                 watched: false
             },
             // don't watch the spec files, rollup-preprocessor will watch them

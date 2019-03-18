@@ -6,9 +6,9 @@ A lightweight reflective dependency injection container.
 [![Coverage Status](https://coveralls.io/repos/github/alexanderwende/injector/badge.svg?branch=master)](https://coveralls.io/github/alexanderwende/injector?branch=master)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-- Minified Size:  3.53 KB
-- Gzipped Size:  1.29 KB
-- Brotli size: 1.16 KB
+- Minified Size:  4.03 KB
+- Gzipped Size:  1.48 KB
+- Brotli size: 1.33 KB
 
 ## Features
 
@@ -59,7 +59,7 @@ To use injector make sure to enable experimental decorators and decorator metada
 
 ### Quickstart
 
-Use the `@injectable` decorator to mark classes as injectable. Create an injector instance and obtain instances of injectable classes by using the `Injector`'s `resolve` method. The `resolve` method infers instance types from the classes you are resolving.
+Use the `@injectable` decorator to mark classes as injectable. Create an injector instance and obtain instances of injectable classes by using `Injector`'s `resolve` method. The `resolve` method infers instance types from the classes you are resolving.
 
 ```typescript
 import { Injector, injectable } from 'injector';
@@ -82,10 +82,10 @@ class MessageClient {
 }
 
 
-// create an `Injector` instance
+// create an injector instance
 const injector = new Injector();
 
-// create instances by letting the `Injector` resolve them
+// create instances by letting the injector resolve them
 const client = injector.resolve(MessageClient)!;
 
 client.service.getMessage(); // --> 'foo'
@@ -93,7 +93,7 @@ client.service.getMessage(); // --> 'foo'
 
 ### @injectable
 
-The `@injectable` decorator marks a class as injectable by creating an `InjectToken` for the constructor and storing it as metadata on the class. The `Injector` will later use the stored `InjectToken` to find the appropriate provider for the token and resolve its dependencies. Constructor parameter dependencies are automatically resolved by type, as long as the depended-on classes have been marked as injectable as well. `Injector` relies on TypeScript emitting decorator metadata for that.
+The `@injectable` decorator marks a class as injectable by creating an `InjectToken` for the constructor and storing it as metadata on the class. `Injector` will later use the stored `InjectToken` to find the appropriate provider for the token and resolve its dependencies. Constructor parameter dependencies are automatically resolved by type, as long as the depended-on classes have been marked as injectable as well. `Injector` relies on TypeScript emitting decorator metadata for that.
 
 ### @inject
 
@@ -123,10 +123,10 @@ class MessageClient {
 }
 
 
-// create an `Injector` instance
+// create an injector instance
 const injector = new Injector();
 
-// create instances by letting the `Injector` resolve them
+// create instances by letting the injector resolve them
 const client = injector.resolve(MessageClient)!;
 
 client.service.getMessage(); // --> 'foo'
@@ -164,14 +164,14 @@ class MessageClient {
 }
 
 
-// create an `Injector` instance
+// create an injector instance
 const injector = new Injector();
 
 // tell the injector how to resolve the MESSAGE_SERVICE token
 // we are using a `ClassProvider` here, but we could use other providers as well
 injector.register(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
 
-// create instances by letting the `Injector` resolve them
+// create instances by letting the injector resolve them
 const client = injector.resolve(MessageClient)!;
 
 client.service.getMessage(); // --> 'foo'
@@ -232,20 +232,19 @@ const client = injector.resolve(MessageClient)!;
 
 #### Reflection
 
-In order for a dependency injection container to resolve a class - or any dependency - the container needs knowledge about the dependencies of that class. The dependencies themselves can be classes and have their own dependencies. A dependency injection container needs to know the entire dependency graph of a given dependency in order to resolve it. 
-
+In order for a dependency injection container to resolve a class - or any dependency - the container needs knowledge about the dependencies of that class. The dependencies themselves can be classes and have their own dependencies. A dependency injection container needs to know the entire dependency graph of a given dependency in order to resolve it.
 
 One way to solve this problem is to explicitly provide the dependency graph to the container through configuration. There are some drawbacks with that approach though:
 
- 1. It creates boilerplate
- 2. It's not DRY - it duplicates information that already exists (a class's constructor already defines its parameters explicitly)
- 3. It's hard to maintain (if you change a constructor's signature you have to remember to update the dependency graph as well)
+- It creates boilerplate
+- It's not DRY - it duplicates information that already exists (a class's constructor already defines its parameters explicitly)
+- It's hard to maintain (if you change a constructor's signature you have to remember to update the dependency graph as well)
 
 Another way to solve this problem is to generate the dependency graph at runtime with the help of reflection. Reflection is the ability of a program to examine, introspect and modify its own structure and behavior. In the context of dependency injection it means that the container is able to gain knowledge about how to resolve a dependency by examining the dependency itself. The key benefits of using reflection are:
 
- 1. Less boilerplate - no unnecessary configuration
- 2. Your code remains DRY (dependencies can be directly inferred from a class's constructor)
- 3. It's easier to maintain (changing a constructor's signature will generate a new dependency graph at runtime)
+- Less boilerplate - no unnecessary configuration
+- Your code remains DRY (dependencies can be directly inferred from a class's constructor)
+- It's easier to maintain (changing a constructor's signature will generate a new dependency graph at runtime)
 
 `Injector` makes use of reflection in multiple ways. Let's illustrate this with an example:
 

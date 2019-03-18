@@ -7,8 +7,8 @@ import { Constructor } from '../utils';
  *
  * @remarks
  * The inject decorator has two use cases:
- * * Injecting dependencies into class properties
- * * Injecting non-class dependencies through {@link InjectToken}s
+ * - Injecting dependencies into class properties
+ * - Injecting non-class dependencies through {@link InjectToken}s
  *
  * When used to inject class properties, it can be used without specifying an {@link InjectToken}.
  * The property type will be used as token and the injector will create a {@link ClassProvider} for
