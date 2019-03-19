@@ -21,9 +21,7 @@ A lightweight reflective dependency injection container.
 - create your own custom providers
 - token based dependencies to allow non-class dependencies
 
-## Guide
-
-### Installation
+## Installation
 
 Injector is not yet published as npm module. However, you can directly install it from its git repository:
 
@@ -56,6 +54,20 @@ To use injector make sure to enable experimental decorators and decorator metada
     }
 }
 ```
+
+## Guide
+
+- [Quickstart](#quickstart)
+- [Injector](#injector-1)
+- [InjectToken](#injecttoken)
+- [@injectable](#injectable)
+- [@inject](#inject)
+- [@optional](#optional)
+- [Provider](#provider)
+- [Factory](#factory)
+- [Concepts](#concepts)
+  - [Reflection](#reflection)
+  - [Hierarchy](#hierarchy)
 
 ### Quickstart
 
@@ -90,6 +102,61 @@ const client = injector.resolve(MessageClient)!;
 
 client.service.getMessage(); // --> 'foo'
 ```
+
+### Injector
+
+The `Injector` class is the dependency injection container. It essentially maintains a list of `InjectToken`s which represent dependencies and their associated `Provider`s which produce the dependencies. It exposes a simple API consisting of two methods:
+
+- `register` - to register an `InjectToken` with its `Provider`
+- `resolve` - to resolve an `InjectToken`
+
+### InjectToken
+
+An `InjectToken` is a unique value that represents a dependency. If dependencies were only classes we wouldn't need one. But of course, that is not the case. Dependencies can also be primitive values which shouldn't be constructed or interfaces which don't even exist at runtime. In both cases we need a way to refer to such a dependency. Imagine the following scenario:
+
+```typescript
+interface Configuration { ... }
+
+@injectable()
+class MessageClient {
+
+    constructor (public config: Configuration, public username: string) {}
+}
+```
+
+If we wanted to let `Injector` resolve a `MessageClient` instance, we would be out of luck. `Injector` uses [reflection](#reflection) to infer dependency types. This works well for classes. However, TypeScript will emit the parameter type `Object` for interfaces which is due to the fact that interfaces don't exist at runtime. And even though we could construct an `Object` that is probably not what we would want here. When it comes to `username` we have a similar situation: TypeScript will emit `String` as parameter type but that doesn't really help us much either.
+
+Most likely, what we would want is for `Injector` to resolve both parameters with concrete values for configuration and username. We don't want `Injector` to resolve all `Object` types and `String` types with those concrete values. So we can't simply register a [provider](#provider) for those types. That is why we will create two `InjectToken`s and annotate both parameters with their respective token:
+
+```typescript
+interface Configuration { ... }
+
+// a token for the configuration
+const CONFIGURATION = new InjectToken<Configuration>('Configuration');
+// a token for the username
+const USERNAME = new InjectToken<string>('Username');
+
+@injectable()
+class MessageClient {
+
+    constructor (
+        // @inject tells the injector not to use the parameter type,
+        // but the token to resolve the dependency
+        @inject(CONFIGURATION) public config: Configuration,
+        @inject(USERNAME) public username: string) {}
+}
+```
+
+By creating an `InjectToken` and annotating the constructor parameter with it we essentially tell `Injector` not to use the type emitted by TypeScript to resolve the dependency, but instead to use the token we provided. We can also use these tokens in multiple places, e.g. if we have other classes that depend on a username, we can use the same `USERNAME` token. The last thing missing for our example to work, is to register a provider for the tokens with the injector:
+
+```typescript
+const injector = new Injector();
+
+injector.provide(USERNAME, new ValueProvider('John'));
+injector.provide(CONFIGURATION, new ClassProvider(SomeClassThatCreatesAConfig));
+```
+
+After registering providers for our tokens we can successfully resolve `MessageClient` instances. As the example shows, `InjectToken`s don't limit us to use `ValueProviders`. We can just as easily provide a configuration through some class that creates instances that implement the `Configuration` interface. In fact, we can even create our own provider to handle the creation of the dependency in a customized way.
 
 ### @injectable
 
@@ -218,10 +285,6 @@ const client = injector.resolve(MessageClient)!;
 // client.config --> undefined
 ```
 
-### Injector
-
-### InjectToken
-
 ### Provider
 
 ### Factory
@@ -258,7 +321,7 @@ class Configuration {}
 @injectable()
 class Client {
     constructor (
-        private service: Service, 
+        private service: Service,
         private config: Configuration) { ... }
 }
 
@@ -314,12 +377,12 @@ class TwitterMessageService implements MessageService {
 @injectable()
 class MessageClient {
     constructor (
-        @inject(MESSAGE_SERVICE) public service: MessageService, 
+        @inject(MESSAGE_SERVICE) public service: MessageService,
         @inject(USER) public user: User) { ... }
 }
 ```
 
-In the example above, we have a `MessageClient` that depends on a `MessageService` in order to send messages. Furthermore, we have two classes implementing the `MessageService` interface. We know intuitively that we can use the same `MessageClient` implementation to send messages via Facebook or Twitter by simply creating a `MessageClient` instance with the appropriate `MessageService` implementation passed into the client's constructor. 
+In the example above, we have a `MessageClient` that depends on a `MessageService` in order to send messages. Furthermore, we have two classes implementing the `MessageService` interface. We know intuitively that we can use the same `MessageClient` implementation to send messages via Facebook or Twitter by simply creating a `MessageClient` instance with the appropriate `MessageService` implementation passed into the client's constructor.
 
 In addition, the client depends on a `User` which is needed to send a message. The `User` is the same for either `MessageService` implementation. This is where the hierarchical design of `Injector` comes in. Imagine we want to build a Facebook message module and a Twitter message module that both share the same `User`. We can easily do this using child injectors:
 
@@ -330,7 +393,7 @@ class FacebookMessageModule {
     private injector: Injector;
     // the message client of the module
     public client: MessageClient;
-    
+
     // the parent injector will inject itself into the constructor
     constructor (parentInjector: Injector) {
         // we create the child injector inside the module
