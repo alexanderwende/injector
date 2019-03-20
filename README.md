@@ -57,17 +57,21 @@ To use injector make sure to enable experimental decorators and decorator metada
 
 ## Guide
 
-- [Quickstart](#quickstart)
-- [Injector](#injector-1)
-- [InjectToken](#injecttoken)
-- [@injectable](#injectable)
-- [@inject](#inject)
-- [@optional](#optional)
-- [Provider](#provider)
-- [Factory](#factory)
-- [Concepts](#concepts)
-  - [Reflection](#reflection)
-  - [Hierarchy](#hierarchy)
+- [Injector](#injector)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Guide](#guide)
+    - [Quickstart](#quickstart)
+    - [Injector](#injector-1)
+    - [InjectToken](#injecttoken)
+    - [@injectable](#injectable)
+    - [@inject](#inject)
+    - [@optional](#optional)
+    - [Provider](#provider)
+    - [Factory](#factory)
+    - [Concepts](#concepts)
+      - [Reflection](#reflection)
+      - [Hierarchy](#hierarchy)
 
 ### Quickstart
 
@@ -288,6 +292,45 @@ const client = injector.resolve(MessageClient)!;
 ### Provider
 
 ### Factory
+
+A factory is a function that accepts parameters and returns a value. The return value of a factory is a resolved dependency. The parameters of a factory are the dependencies required to create the resolved dependency. `Injector` does not deal with factories directly, but rather through [providers](#provider). Every provider has a factory to create the value it provides. `Injector` contains three factory types:
+
+- ValueFactory (creates a dependency-less value)
+- ClassFactory (creates an instance of a class every time it is invoked)
+- SingletonFactory (creates an instance of a class once and subsequently returns the cached instance)
+
+To illustrate how you can use and create your own factories let's have a look at how `Injector` implements the `ClassFactory`:
+
+```typescript
+export interface ClassFactory<T> extends Factory<T> {
+    (...dependencies: any[]): T;
+}
+
+export const createClassFactory = <T> (constructorFn: Constructor<T>): ClassFactory<T> => {
+
+    return (...dependencies: any[]) => {
+
+        return Reflect.construct(constructorFn, dependencies);
+    };
+};
+```
+
+There are a couple of things to note about the implementation. Firstly, each factory should implement the generic `Factory<T>` interface. This allows the provider which will use the factory to infer the type of the value created by the factory. It enables TypScript to properly type check and gives you code completion.
+
+Secondly, the factory function itself is wrapped in another function `createClassFactory` - its own factory if you will. This is usefull to give the factory an isolated scope which can hold references to variables you want to store over multiple invocations of the factory. In this case it is used to hold a reference to `constructorFn`, the class who's instances the factory creates. This frees the `ClassProvider` from having to know about the class it provides. It can rely solely on the factory for that.
+
+Finally, let's create a custom factory. Assume you want to create a factory, that provides numbers in an ascending order:
+
+```typescript
+export interface AscendingNumberFactory extends Factory<number> {
+    (): number;
+}
+
+export const createAscendingNumberFactory = (startWith: number = 0): AscendingNumberFactory => {
+
+    return () => startWith++;
+};
+```
 
 ### Concepts
 
