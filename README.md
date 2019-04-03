@@ -5,6 +5,7 @@ A lightweight reflective dependency injection container.
 [![Build Status](https://travis-ci.org/alexanderwende/injector.svg?branch=master)](https://travis-ci.org/alexanderwende/injector)
 [![Coverage Status](https://coveralls.io/repos/github/alexanderwende/injector/badge.svg?branch=master)](https://coveralls.io/github/alexanderwende/injector?branch=master)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 - Minified Size:  4.03 KB
 - Gzipped Size:  1.48 KB
@@ -290,6 +291,10 @@ const client = injector.resolve(MessageClient)!;
 ```
 
 ### Provider
+
+A provider is a class that can provide a particular dependency. Providers encapsulate the aspect of creating a dependency and free the injector from it.
+
+A provider consists of a [factory](#factory) and two optional maps describing the parameter and property dependencies of its provided dependency.
 
 ### Factory
 
