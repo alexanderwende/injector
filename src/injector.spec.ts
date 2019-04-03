@@ -1,81 +1,9 @@
 import { inject, injectable, optional } from './decorators';
 import { InjectToken } from './inject-token';
-import { Injector, NO_PROVIDER, CLASS_NOT_RESOLVABLE, CLASS_NOT_PROVIDABLE } from './injector';
+import { CLASS_NOT_PROVIDABLE, CLASS_NOT_RESOLVABLE, Injector, NO_PROVIDER } from './injector';
 import { ClassProvider, SingletonProvider, ValueProvider } from './providers';
 
 describe('Injector', () => {
-
-    interface Weapon {
-
-        use (): string;
-    }
-
-    @injectable()
-    class Sword implements Weapon {
-
-        use () {
-
-            return 'Sword strike...';
-        }
-    }
-
-    @injectable()
-    class Gun implements Weapon {
-
-        use () {
-
-            return 'Gun shot...';
-        }
-    }
-
-    @injectable()
-    class Revolver extends Gun {
-
-        constructor () {
-
-            super();
-        }
-
-        use () {
-
-            return 'Revolver shot...';
-        }
-    }
-
-    @injectable()
-    class Water {
-
-        drink () {
-
-            return 'Gulp, gulp, gulp...';
-        };
-    }
-
-    // interfaces disappear after compilation, so we need to create an InjectToken
-    // for the interface if we want to use it in the injector
-    const WEAPON_TOKEN = new InjectToken<Weapon>('Weapon');
-
-    // we can also create tokens for arbitrary values
-    const NAME_TOKEN = new InjectToken<string>('NAME');
-
-    @injectable()
-    class Warrior {
-
-        @optional() @inject(NAME_TOKEN)
-        public name!: string;
-
-        constructor (@inject(WEAPON_TOKEN) public weapon: Weapon, public drink?: Water) { }
-
-        fight (useWeapon: boolean = false) {
-
-            return `${ this.name } fights: ${ useWeapon ? this.weapon.use() : 'Fist punch...' }`;
-        }
-
-        rest () {
-
-            return `${ this.name } rests: ${ this.drink ? this.drink.drink() : '' }`;
-        }
-    }
 
     it('should create an injector', () => {
 
@@ -87,99 +15,160 @@ describe('Injector', () => {
 
     it('should resolve classes', () => {
 
+        @injectable()
+        class Service {
+
+            get () { return 'foo'; }
+        }
+
         const injector = new Injector();
 
-        expect(injector.resolve(Sword)! instanceof Sword).toBe(true);
-        expect(injector.resolve(Sword)!.use()).toBe('Sword strike...');
-
-        expect(injector.resolve(Water)! instanceof Water).toBe(true);
-        expect(injector.resolve(Water)!.drink()).toBe('Gulp, gulp, gulp...');
+        expect(injector.resolve(Service)! instanceof Service).toBe(true);
+        expect(injector.resolve(Service)!.get()).toBe('foo');
     });
 
     it('should resolve tokens', () => {
 
+        @injectable()
+        class Service {
+
+            get () { return 'foo'; }
+        }
+
+        const SERVICE = new InjectToken<Service>('Service');
+        const CONFIG = new InjectToken<any>('Config');
+
         const injector = new Injector();
 
-        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
-        injector.register(NAME_TOKEN, new ValueProvider('Clay'));
+        injector.register(SERVICE, new ClassProvider(Service));
+        injector.register(CONFIG, new ValueProvider({ foo: true }));
 
-        expect(injector.resolve(WEAPON_TOKEN)! instanceof Sword).toBe(true);
-        expect(injector.resolve(WEAPON_TOKEN)!.use()).toBe('Sword strike...');
+        expect(injector.resolve(SERVICE)! instanceof Service).toBe(true);
+        expect(injector.resolve(SERVICE)!.get()).toBe('foo');
 
-        expect(injector.resolve(NAME_TOKEN)!).toBe('Clay');
+        expect(injector.resolve(CONFIG)!).toEqual({ foo: true });
     });
 
-    it('should resolve dependencies correctly', () => {
+    it('should resolve class dependencies', () => {
+
+        interface User {
+            username: string;
+        }
+
+        const USER = new InjectToken<User>('User');
+
+        interface MessageServiceConfig {
+            receiveMessages: boolean;
+        }
+
+        const MESSAGE_SERVICE_CONFIG = new InjectToken<MessageServiceConfig>('MessageServiceConfig');
+
+        @injectable()
+        class MessageService {
+
+            constructor (@inject(MESSAGE_SERVICE_CONFIG) public config: MessageServiceConfig) { }
+
+            getMessage (username: string): string | undefined {
+
+                return this.config.receiveMessages ? `new message for ${ username }: Hi!` : undefined;
+            }
+        }
+
+        @injectable()
+        class MessageClient {
+
+            @inject(USER)
+            user!: User;
+
+            constructor (public service: MessageService) { }
+
+            getMessage (): string | undefined {
+
+                return this.service.getMessage(this.user.username);
+            }
+        }
 
         const injector = new Injector();
 
-        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
-        injector.register(NAME_TOKEN, new ValueProvider('Clay'));
+        injector.register(USER, new ValueProvider<User>({ username: 'steven' }));
+        injector.register(MESSAGE_SERVICE_CONFIG, new ValueProvider<MessageServiceConfig>({ receiveMessages: true }));
 
-        const warrior = injector.resolve(Warrior)!;
+        const client = injector.resolve(MessageClient)!;
 
-        expect(warrior.name).toBe('Clay');
-        expect(warrior.weapon instanceof Sword).toBe(true);
-        expect(warrior.drink instanceof Water).toBe(true);
+        expect(client).toBeDefined();
+        expect(client.user).toEqual({ username: 'steven' });
+        expect(client.service instanceof MessageService).toBe(true);
+        expect(client.service.config).toEqual({ receiveMessages: true });
+        expect(client.getMessage()).toBe('new message for steven: Hi!');
 
-        expect(warrior.fight(true)).toBe('Clay fights: Sword strike...');
-        expect(warrior.fight()).toBe('Clay fights: Fist punch...');
-        expect(warrior.rest()).toBe('Clay rests: Gulp, gulp, gulp...');
+        injector.register(MESSAGE_SERVICE_CONFIG, new ValueProvider<MessageServiceConfig>({ receiveMessages: false }));
 
-        const warrior2 = injector.resolve(Warrior)!;
+        const client2 = injector.resolve(MessageClient)!;
 
-        expect(warrior2.name).toBe('Clay');
-        expect(warrior2.weapon instanceof Sword).toBe(true);
-        expect(warrior2.drink instanceof Water).toBe(true);
-
-        // instances of Sword and Water should be distinct
-        expect(warrior.weapon).not.toBe(warrior2.weapon);
-        expect(warrior.drink).not.toBe(warrior2.drink);
-    });
-
-    it('can be configured with different dependencies', () => {
-
-        const injector = new Injector();
-
-        injector.register(WEAPON_TOKEN, new ClassProvider(Revolver));
-        injector.register(NAME_TOKEN, new ValueProvider('Cliff'));
-
-        const warrior = injector.resolve(Warrior)!;
-
-        expect(warrior.name).toBe('Cliff');
-        expect(warrior.weapon instanceof Revolver).toBe(true);
-        expect(warrior.drink instanceof Water).toBe(true);
-
-        expect(warrior.fight(true)).toBe('Cliff fights: Revolver shot...');
-        expect(warrior.fight()).toBe('Cliff fights: Fist punch...');
-        expect(warrior.rest()).toBe('Cliff rests: Gulp, gulp, gulp...');
+        expect(client2.user).toEqual({ username: 'steven' });
+        expect(client2.service instanceof MessageService).toBe(true);
+        expect(client2.service.config).toEqual({ receiveMessages: false });
+        expect(client2.getMessage()).toBe(undefined);
     });
 
     it('should resolve singleton dependencies correctly', () => {
 
+        @injectable()
+        class MessageServiceConfig {
+
+            constructor (@optional() public receiveMessages: boolean = true) { }
+        }
+
+        @injectable()
+        class MessageService {
+
+            constructor (public config: MessageServiceConfig) { }
+
+            getMessage (): string | undefined {
+
+                return this.config.receiveMessages ? `new message: Hi!` : undefined;
+            }
+        }
+
+        @injectable()
+        class MessageClient {
+
+            constructor (public service: MessageService) { }
+
+            getMessage (): string | undefined {
+
+                return this.service.getMessage();
+            }
+        }
+
         const injector = new Injector();
 
-        injector.register(WEAPON_TOKEN, new SingletonProvider(Gun));
-        injector.register(NAME_TOKEN, new ValueProvider('Smith'));
+        injector.register(MessageService, new SingletonProvider(MessageService));
 
-        const warrior = injector.resolve(Warrior)!;
+        const client = injector.resolve(MessageClient)!;
 
-        expect(warrior.name).toBe('Smith');
-        expect(warrior.weapon instanceof Gun).toBe(true);
-        expect(warrior.drink instanceof Water).toBe(true);
+        expect(client).toBeDefined();
+        expect(client.service instanceof MessageService).toBe(true);
+        expect(client.service.config instanceof MessageServiceConfig).toBe(true);
+        expect(client.service.config.receiveMessages).toBe(true);
+        expect(client.getMessage()).toBe('new message: Hi!');
 
-        const warrior2 = injector.resolve(Warrior)!;
+        const client2 = injector.resolve(MessageClient)!;
 
-        expect(warrior2.name).toBe('Smith');
-        expect(warrior2.weapon instanceof Gun).toBe(true);
-        expect(warrior2.drink instanceof Water).toBe(true);
+        expect(client2).toBeDefined();
+        expect(client2.service instanceof MessageService).toBe(true);
+        expect(client2.service.config instanceof MessageServiceConfig).toBe(true);
+        expect(client2.service.config.receiveMessages).toBe(true);
+        expect(client2.getMessage()).toBe('new message: Hi!');
 
-        // instances of Gun should be the same
-        expect(warrior.weapon).toBe(warrior2.weapon);
+        // the instances of service and service.config should be the same in both clients
+        expect(client.service).toBe(client2.service);
+        // even though config is not registered as singleton, it should be created only once
+        // during the creation of the service instance
+        expect(client.service.config).toBe(client2.service.config);
     });
 
-    // this is new
-    it('should allow providing classes directly', () => {
+    it('should allow registering providers for classes', () => {
 
         @injectable()
         class MessageService {
@@ -249,23 +238,6 @@ describe('Injector', () => {
         expect(register).toThrowError(CLASS_NOT_PROVIDABLE(MessageClient).message);
     });
 
-    it('should pass undefined for optional missing dependency', () => {
-
-        const injector = new Injector();
-
-        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
-
-        const warrior = injector.resolve(Warrior)!;
-
-        expect(warrior.name).toBeUndefined();
-        expect(warrior.weapon instanceof Sword).toBe(true);
-        expect(warrior.drink instanceof Water).toBe(true);
-
-        expect(warrior.fight(true)).toBe('undefined fights: Sword strike...');
-        expect(warrior.fight()).toBe('undefined fights: Fist punch...');
-        expect(warrior.rest()).toBe('undefined rests: Gulp, gulp, gulp...');
-    });
-
     it('should provide itself', () => {
 
         @injectable()
@@ -289,44 +261,6 @@ describe('Injector', () => {
         service = child.resolve(Service)!;
 
         expect(service.injector).toBe(child);
-    });
-
-    it('can use parent injectors', () => {
-
-        const injector = new Injector();
-
-        // we set up the root injector
-        injector.register(WEAPON_TOKEN, new ClassProvider(Sword));
-        injector.register(NAME_TOKEN, new ValueProvider('Clay'));
-
-        const warrior = injector.resolve(Warrior)!;
-
-        expect(warrior.name).toBe('Clay');
-        expect(warrior.weapon instanceof Sword).toBe(true);
-        expect(warrior.drink instanceof Water).toBe(true);
-
-        // we create a child injector
-        const childInjector = new Injector(injector);
-
-        const warrior2 = childInjector.resolve(Warrior)!;
-
-        expect(warrior2.name).toBe('Clay');
-        expect(warrior2.weapon instanceof Sword).toBe(true);
-        expect(warrior2.drink instanceof Water).toBe(true);
-
-        // we configure the child injector
-        childInjector.register(WEAPON_TOKEN, new ClassProvider(Revolver));
-        childInjector.register(NAME_TOKEN, new ValueProvider('John'));
-
-        const warrior3 = childInjector.resolve(Warrior)!;
-
-        expect(warrior3.name).toBe('John');
-        expect(warrior3.weapon instanceof Revolver).toBe(true);
-        expect(warrior3.drink instanceof Water).toBe(true);
-
-        expect(warrior3.fight(true)).toBe('John fights: Revolver shot...');
-        expect(warrior3.fight()).toBe('John fights: Fist punch...');
-        expect(warrior3.rest()).toBe('John rests: Gulp, gulp, gulp...');
     });
 
     it('should be able to use hierarchical injectors', () => {
@@ -387,7 +321,7 @@ describe('Injector', () => {
         // this is a module which needs to be resolved from a child injector
         @injectable()
         class TwitterMessageModule {
-            constructor (public client: MessageClient) {}
+            constructor (public client: MessageClient) { }
         }
 
         // this will be the parent injector

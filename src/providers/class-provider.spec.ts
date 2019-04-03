@@ -51,4 +51,23 @@ describe('ClassProvider', () => {
         expect(result.foo instanceof Foo).toBe(true);
         expect(result.bar instanceof Bar).toBe(true);
     });
+
+    it('should provide a new instances every time', () => {
+
+        @injectable()
+        class Foo {}
+
+        const injector = new Injector();
+        const provider = new ClassProvider(Foo);
+
+        const foo1 = provider.provide(injector);
+
+        expect(foo1 instanceof Foo).toBe(true);
+
+        const foo2 = provider.provide(injector);
+
+        expect(foo2 instanceof Foo).toBe(true);
+
+        expect(foo1).not.toBe(foo2);
+    });
 });
