@@ -171,7 +171,10 @@ describe('Injector', () => {
     it('should allow registering providers for classes', () => {
 
         @injectable()
-        class MessageService {
+        class MessageService { }
+
+        @injectable()
+        class ConcreteMessageService {
 
             getMessage (): string {
                 return 'message';
@@ -186,13 +189,13 @@ describe('Injector', () => {
 
         const injector = new Injector();
 
-        injector.register(MessageService, new SingletonProvider(MessageService));
+        injector.register(MessageService, new SingletonProvider(ConcreteMessageService));
 
         const client1 = injector.resolve(MessageClient)!;
         const client2 = injector.resolve(MessageClient)!;
 
-        expect(client1.service instanceof MessageService).toBe(true);
-        expect(client2.service instanceof MessageService).toBe(true);
+        expect(client1.service instanceof ConcreteMessageService).toBe(true);
+        expect(client2.service instanceof ConcreteMessageService).toBe(true);
         expect(client1.service).toBe(client2.service);
     });
 
