@@ -1,7 +1,7 @@
-import { ParameterAnnotations, PropertyAnnotations, DependencyAnnotation } from '../annotations';
+import { DependencyAnnotation } from '../annotations';
 import { Factory } from '../factories';
 import { Injector } from '../injector';
-import { Provider } from './provider';
+import { ParameterDependencies, PropertyDependencies, Provider } from './provider';
 
 /**
  * @internal
@@ -26,10 +26,10 @@ export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with 
  *
  * const factory = (foo: Foo, bar: Bar) => ({ foo: foo, bar: bar });
  *
- * const provider = new BaseProvider(factory, new Map([
- *      [0, { token: Foo, optional: false }],
- *      [1, { token: Bar, optional: false }],
- * ]));
+ * const provider = new BaseProvider(factory, [
+ *      new DependencyAnnotation(Foo),
+ *      new DependencyAnnotation(Bar)
+ * ]);
  *
  * const injector = new Injector();
  *
@@ -52,6 +52,8 @@ export const PROVIDER_UNREGISTERED = new Error('Provider is not registered with 
 export class BaseProvider<T> implements Provider<T> {
 
     public injector: Injector | undefined;
+    public parameters: Map<number, DependencyAnnotation | any>;
+    public properties: Map<PropertyKey, DependencyAnnotation | any>;
 
     /**
      * The `BaseProvider` constructor
@@ -62,8 +64,21 @@ export class BaseProvider<T> implements Provider<T> {
      */
     constructor (
         public factory: Factory<T>,
-        public parameters: ParameterAnnotations = new Map(),
-        public properties: PropertyAnnotations = new Map()) { }
+        parameters: ParameterDependencies = new Map(),
+        properties: PropertyDependencies = new Map()) {
+
+        // TODO: update to TypeScript 3.4 for better support of map() --> we can then remove the assertion
+        this.parameters = !(parameters instanceof Map)
+            ? new Map(parameters.map((value, index) => [index, value] as [number, any]))
+            : parameters;
+
+        this.properties = !(properties instanceof Map)
+            ? new Map([
+                ...Object.getOwnPropertyNames(properties).map(key => [key, properties[key]]) as [string | number, any],
+                ...Object.getOwnPropertySymbols(properties).map(symbol => [symbol, properties[symbol as any]])
+            ])
+            : properties;
+    }
 
     /**
      * Get the provider's provided value
@@ -85,7 +100,12 @@ export class BaseProvider<T> implements Provider<T> {
     }
 
     /**
-     * Resolves the parameter dependencies for the factory from the current injector
+     * Resolves the parameter dependencies for the factory
+     *
+     * @remarks
+     * If a parameter dependency is a {@link DependencyAnnotation} it will be resolved
+     * from the current injector. Otherwise its value will be used to resolve the
+     * dependency.
      *
      * @param injector - The current injector that runs the provider
      * @returns An array of resolved parameter dependencies
@@ -94,24 +114,37 @@ export class BaseProvider<T> implements Provider<T> {
 
         const parameters: any[] = [];
 
-        this.parameters.forEach(({ token, optional }, index) => parameters[index] = injector.resolve(token, optional));
+        this.parameters.forEach((parameter, index) => {
+            parameters[index] = (parameter instanceof DependencyAnnotation)
+                ? injector.resolve(parameter.token, parameter.optional)
+                : parameter;
+        });
 
         return parameters;
     }
 
     /**
-     * Resolves the property dependencies for the factory from the current injector
+     * Resolves the property dependencies for the factory
+     *
+     * @remarks
+     * If a property dependency is a {@link DependencyAnnotation} it will be resolved
+     * from the current injector. Otherwise its value will be used to resolve the
+     * dependency.
      *
      * @param injector - The current injector that runs the provider
      * @returns An object of resolved property dependencies
      */
     protected resolveProperties (injector: Injector): any {
 
-        const result: any = {};
+        const properties: any = {};
 
-        this.properties.forEach(({ token, optional }, key) => result[key] = injector.resolve(token, optional));
+        this.properties.forEach((property, key) => {
+            properties[key] = (property instanceof DependencyAnnotation)
+                ? injector.resolve(property.token, property.optional)
+                : property;
+        });
 
-        return result;
+        return properties;
     }
 
     /**

@@ -1,12 +1,8 @@
-import {
-    getParameterAnnotations,
-    getPropertyAnnotations,
-    ParameterAnnotations,
-    PropertyAnnotations
-} from '../annotations';
+import { getParameterAnnotations, getPropertyAnnotations } from '../annotations';
 import { createClassFactory } from '../factories';
 import { Constructor } from '../utils';
 import { BaseProvider } from './base-provider';
+import { ParameterDependencies, PropertyDependencies } from './provider';
 
 /**
  * A provider for class instances
@@ -45,8 +41,8 @@ export class ClassProvider<T> extends BaseProvider<T> {
 
     constructor (
         constructorFn: Constructor<T>,
-        parameters?: ParameterAnnotations,
-        properties?: PropertyAnnotations) {
+        parameters?: ParameterDependencies,
+        properties?: PropertyDependencies) {
 
         super(
             createClassFactory(constructorFn),
