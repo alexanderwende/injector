@@ -3,11 +3,27 @@ import { Constructor } from '../utils';
 import * as ANNOTATION from './metadata-keys';
 
 /**
- * A dependency annotation describes a constructor parameter or class property dependency
+ * A dependency annotation describes a dependency that should be resolved by an injector
+ *
+ * @remarks
+ * Most classes have dependencies, either in the form of constructor parameters or in
+ * the form of properties which can be injected. When a provider is created for a class
+ * it needs to know about the class's dependencies. The provider can obtain a map of the
+ * class's dependencies by respectively calling {@link getParameterAnnotations} or
+ * {@link getPropertyAnnotations} if the class was decorated as {@link injectable}. A
+ * DependencyAnnotation does not contain a value itself, but rather a token which allows
+ * the provider to resolve the class's dependency via the injector. This allows a great
+ * deal of flexibility, especially when combined with child injectors.
+ *
+ * DependencyAnnotations are not only useful for class dependencies though. They can be
+ * equally useful when creating simple factory providers, where the factories dependencies
+ * should be resolved through an {@link InjectToken} at runtime.
  */
-export interface DependencyAnnotation<T = any> {
-    token: InjectToken<T> | Constructor<T>;
-    optional: boolean;
+export class DependencyAnnotation<T = any> {
+
+    constructor (
+        public token: InjectToken<T> | Constructor<T>,
+        public optional: boolean = false) { }
 }
 
 /**
@@ -132,7 +148,7 @@ const ensureParameterAnnotations = (target: Constructor) => {
         const parameterTypes: Constructor[] = Reflect.getOwnMetadata(ANNOTATION.DESIGN_PARAMETER_TYPES, target) || [];
         const parameterAnnotations: ParameterAnnotations = new Map(
             parameterTypes.map(
-                (type, index) => [index, createDependencyAnnotation(type)] as [number, DependencyAnnotation]
+                (type, index) => [index, new DependencyAnnotation(type)] as [number, DependencyAnnotation]
             ));
 
         Reflect.defineMetadata(ANNOTATION.PARAMETERS, parameterAnnotations, target);
@@ -153,7 +169,7 @@ const ensurePropertyAnnotation = (target: Constructor, propertyKey: PropertyKey)
             propertyKey as string | symbol
         ) as InjectToken | Constructor;
 
-        properties.set(propertyKey, createDependencyAnnotation(propertyType));
+        properties.set(propertyKey, new DependencyAnnotation(propertyType));
     }
 };
 
@@ -164,11 +180,3 @@ const ensurePropertyAnnotations = (target: Constructor) => {
         Reflect.defineMetadata(ANNOTATION.PROPERTIES, new Map(), target);
     }
 };
-
-const createDependencyAnnotation = <T> (
-    token: InjectToken<T> | Constructor<T>,
-    optional = false
-): DependencyAnnotation<T> => ({
-    token: token,
-    optional: optional
-});
