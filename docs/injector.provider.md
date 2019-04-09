@@ -2,14 +2,16 @@
 
 # Provider interface
 
+The generic provider interface
+
 ## Properties
 
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [`factory`](./injector.provider.factory.md) | `Factory<T>` |  |
 |  [`injector`](./injector.provider.injector.md) | `Injector | undefined` |  |
-|  [`parameters`](./injector.provider.parameters.md) | `ParameterAnnotations` |  |
-|  [`properties`](./injector.provider.properties.md) | `PropertyAnnotations` |  |
+|  [`parameters`](./injector.provider.parameters.md) | `ParameterDependencies` |  |
+|  [`properties`](./injector.provider.properties.md) | `PropertyDependencies` |  |
 
 ## Methods
 

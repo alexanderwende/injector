@@ -2,7 +2,7 @@
 
 # Injector.constructor method
 
-Creates an injector instance.
+Creates an injector instance
 
 **Signature:**
 ```javascript
@@ -13,8 +13,8 @@ constructor(parent?: Injector);
 
 A child injector can be created by passing the parent injector as a constructor argument.
 ```javascript
-const rootInjector = new Injector();
-const childInjector = new Injector(rootInjector);
+const parentInjector = new Injector();
+const childInjector = new Injector(parentInjector);
 
 ```
 
@@ -22,5 +22,5 @@ const childInjector = new Injector(rootInjector);
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `parent` | `Injector` | A parent injector |
+|  `parent` | `Injector` |  |
 

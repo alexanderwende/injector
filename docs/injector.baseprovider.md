@@ -10,8 +10,8 @@ The `BaseProvider` class
 |  --- | --- | --- | --- |
 |  [`factory`](./injector.baseprovider.factory.md) |  | `Factory<T>` |  |
 |  [`injector`](./injector.baseprovider.injector.md) |  | `Injector | undefined` |  |
-|  [`parameters`](./injector.baseprovider.parameters.md) |  | `ParameterAnnotations` |  |
-|  [`properties`](./injector.baseprovider.properties.md) |  | `PropertyAnnotations` |  |
+|  [`parameters`](./injector.baseprovider.parameters.md) |  | `Map<number, DependencyAnnotation | any>` |  |
+|  [`properties`](./injector.baseprovider.properties.md) |  | `Map<PropertyKey, DependencyAnnotation | any>` |  |
 
 ## Methods
 
@@ -20,8 +20,8 @@ The `BaseProvider` class
 |  [`constructor(factory, parameters, properties)`](./injector.baseprovider.constructor.md) |  |  | The `BaseProvider` constructor |
 |  [`createValue(parameters, properties)`](./injector.baseprovider.createvalue.md) | `protected` | `T` | Creates the provider's provided value by invoking the factory |
 |  [`provide(injector)`](./injector.baseprovider.provide.md) |  | `T` | Get the provider's provided value |
-|  [`resolveParameters(injector)`](./injector.baseprovider.resolveparameters.md) | `protected` | `any[]` | Resolves the parameter dependencies for the factory from the current injector |
-|  [`resolveProperties(injector)`](./injector.baseprovider.resolveproperties.md) | `protected` | `any` | Resolves the property dependencies for the factory from the current injector |
+|  [`resolveParameters(injector)`](./injector.baseprovider.resolveparameters.md) | `protected` | `any[]` | Resolves the parameter dependencies for the factory |
+|  [`resolveProperties(injector)`](./injector.baseprovider.resolveproperties.md) | `protected` | `any` | Resolves the property dependencies for the factory |
 
 ## Remarks
 
@@ -35,10 +35,10 @@ class Bar {}
 
 const factory = (foo: Foo, bar: Bar) => ({ foo: foo, bar: bar });
 
-const provider = new BaseProvider(factory, new Map([
-     [0, { token: Foo, optional: false }],
-     [1, { token: Bar, optional: false }],
-]));
+const provider = new BaseProvider(factory, [
+     new DependencyAnnotation(Foo),
+     new DependencyAnnotation(Bar)
+]);
 
 const injector = new Injector();
 

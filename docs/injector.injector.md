@@ -8,7 +8,7 @@ The injector class
 
 |  Method | Access Modifier | Returns | Description |
 |  --- | --- | --- | --- |
-|  [`constructor(parent)`](./injector.injector.constructor.md) |  |  | Creates an injector instance. |
+|  [`constructor(parent)`](./injector.injector.constructor.md) |  |  | Creates an injector instance |
 |  [`register(constructorOrToken, provider)`](./injector.injector.register.md) |  | `void` | Register a provider for a dependency with the injector |
 |  [`resolve(target, optional)`](./injector.injector.resolve.md) |  | `T | undefined` | Resolve a dependency |
 

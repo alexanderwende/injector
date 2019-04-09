@@ -14,6 +14,6 @@ register<T>(constructorOrToken: Constructor<T> | InjectToken<T>, provider: Provi
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  `constructorOrToken` | `Constructor<T> | InjectToken<T>` | The class or [InjectToken](./injector.injecttoken.md) for which to register a provider for |
+|  `constructorOrToken` | `Constructor<T> | InjectToken<T>` | The class or [InjectToken](./injector.injecttoken.md) for which to register the provider |
 |  `provider` | `Provider<T>` | The [Provider](./injector.provider.md) which will be used to resolve the class or token |
 

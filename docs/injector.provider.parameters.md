@@ -5,5 +5,5 @@
 
 **Signature:**
 ```javascript
-parameters: ParameterAnnotations
+parameters: ParameterDependencies
 ```

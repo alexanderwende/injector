@@ -2,7 +2,7 @@
 
 # BaseProvider.resolveProperties method
 
-Resolves the property dependencies for the factory from the current injector
+Resolves the property dependencies for the factory
 
 **Signature:**
 ```javascript
@@ -11,6 +11,10 @@ protected resolveProperties(injector: Injector): any;
 **Returns:** `any`
 
 An object of resolved property dependencies
+
+## Remarks
+
+If a property dependency is a [DependencyAnnotation](./injector.dependencyannotation.md) it will be resolved from the current injector. Otherwise its value will be used to resolve the dependency.
 
 ## Parameters
 

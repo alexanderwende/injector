@@ -5,5 +5,5 @@
 
 **Signature:**
 ```javascript
-properties: PropertyAnnotations
+properties: PropertyDependencies
 ```
