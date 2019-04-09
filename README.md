@@ -7,9 +7,32 @@ A lightweight reflective dependency injection container.
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
-- Minified Size:  4.03 KB
-- Gzipped Size:  1.48 KB
-- Brotli size: 1.33 KB
+- Minified Size: 4.53 KB
+- Gzipped Size: 1.63 KB
+- Brotli size: 1.48 KB
+
+## Table of Contents
+
+- [Injector](#injector)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Quickstart](#quickstart)
+  - [Guide](#guide)
+    - [Injector](#injector-1)
+    - [InjectToken](#injecttoken)
+    - [@injectable](#injectable)
+    - [@inject](#inject)
+    - [@optional](#optional)
+    - [Provider](#provider)
+      - [ClassProvider](#classprovider)
+      - [SingletonProvider](#singletonprovider)
+      - [ValueProvider](#valueprovider)
+      - [BaseProvider](#baseprovider)
+    - [Factory](#factory)
+    - [Concepts](#concepts)
+      - [Reflection](#reflection)
+      - [Hierarchy](#hierarchy)
 
 ## Features
 
@@ -56,25 +79,7 @@ To use injector make sure to enable experimental decorators and decorator metada
 }
 ```
 
-## Guide
-
-- [Injector](#injector)
-  - [Features](#features)
-  - [Installation](#installation)
-  - [Guide](#guide)
-    - [Quickstart](#quickstart)
-    - [Injector](#injector-1)
-    - [InjectToken](#injecttoken)
-    - [@injectable](#injectable)
-    - [@inject](#inject)
-    - [@optional](#optional)
-    - [Provider](#provider)
-    - [Factory](#factory)
-    - [Concepts](#concepts)
-      - [Reflection](#reflection)
-      - [Hierarchy](#hierarchy)
-
-### Quickstart
+## Quickstart
 
 Use the `@injectable` decorator to mark classes as injectable. Create an injector instance and obtain instances of injectable classes by using `Injector`'s `resolve` method. The `resolve` method infers instance types from the classes you are resolving.
 
@@ -94,7 +99,7 @@ class MessageService {
 @injectable()
 class MessageClient {
 
-    // `Injector` will resolve constructor parameter dependencies automatically
+    // Injector will resolve constructor parameter dependencies automatically
     constructor (public service: MessageService) {}
 }
 
@@ -108,9 +113,11 @@ const client = injector.resolve(MessageClient)!;
 client.service.getMessage(); // --> 'foo'
 ```
 
+## Guide
+
 ### Injector
 
-The `Injector` class is the dependency injection container. It essentially maintains a list of `InjectToken`s which represent dependencies and their associated `Provider`s which produce the dependencies. It exposes a simple API consisting of two methods:
+The `Injector` class is the dependency injection container. It essentially maintains a list of [`InjectToken`](#injecttoken)s which represent dependencies and their associated [`Provider`](#provider)s which produce the dependencies. It exposes a simple API consisting of two methods:
 
 - `register` - to register an `InjectToken` with its `Provider`
 - `resolve` - to resolve an `InjectToken`
@@ -167,6 +174,18 @@ After registering providers for our tokens we can successfully resolve `MessageC
 
 The `@injectable` decorator marks a class as injectable by creating an `InjectToken` for the constructor and storing it as metadata on the class. `Injector` will later use the stored `InjectToken` to find the appropriate provider for the token and resolve its dependencies. Constructor parameter dependencies are automatically resolved by type, as long as the depended-on classes have been marked as injectable as well. `Injector` relies on TypeScript emitting decorator metadata for that.
 
+```typescript
+// by decorating a class as injectable, an injector can resolve it
+@injectable()
+class Service {}
+
+const injector = new Injector();
+
+const service = injector.resolve(Service)!;
+
+service instanceof Service; // --> true
+```
+
 ### @inject
 
 The `@inject` decorator has two use cases:
@@ -204,7 +223,7 @@ const client = injector.resolve(MessageClient)!;
 client.service.getMessage(); // --> 'foo'
 ```
 
-**Injecting non-class dependencies through `InjectToken`s**. Primitive values - and values in general - can not be injected reflectively as they can't be solely identified by a type. Interfaces disappear at runtime and connot be injected reflectively either. For those cases we need an `InjectToken` to tie the value or interface to a token that can be identified by the injector. You can read more about [`InjectToken`](#injecttoken)s below.
+**Injecting non-class dependencies through `InjectToken`s**. Primitive values - and values in general - can not be injected reflectively as they can't be solely identified by a type. Interfaces disappear at runtime and connot be injected reflectively either. For those cases we need an [`InjectToken`](#injecttoken) to tie the value or interface to a token that can be identified by the injector.
 
 ```typescript
 import { Injector, InjectToken, injectable, inject, ClassProvider } from 'injector';
@@ -292,9 +311,234 @@ const client = injector.resolve(MessageClient)!;
 
 ### Provider
 
-A provider is a class that can provide a particular dependency. Providers encapsulate the aspect of creating a dependency and free the injector from it.
+A provider is a class which can produce a particular type of dependency. This is reflected in the generic type a provider exposes. A provider which produces instances of a class `Service` would therefore be described as follows:
 
-A provider consists of a [factory](#factory) and two optional maps describing the parameter and property dependencies of its provided dependency.
+```typescript
+@injectable()
+class Service {}
+
+const serviceProvider: Provider<Service>;
+```
+
+To make a provider available to an `Injector` instance, it has to be registered with the injector through the use of an [`InjectToken`](#injecttoken) or a reference to a class which has been decorated as [`@injectable()`](#@injectable):
+
+```typescript
+@injectable()
+class SomeClass {}
+
+@injectable()
+class SomeOtherClass extends SomeClass {}
+
+const TOKEN = new InjectToken<string>('SomeToken');
+
+const injector = new Injector();
+
+// register a special ClassProvider which produces instances of SomeOtherClass
+// the injector will now use this provider when resolving a dependency of type SomeClass
+injector.register(SomeClass, new ClassProvider(SomeOtherClass));
+
+// register a special ValueProvider which produces the string `some value`
+// the injector will now use this provider when resolving a dependency with the token TOKEN
+injector.register(TOKEN, new ValueProvider('some value'));
+```
+
+As you can see in the example, there exist more than just one provider. More on that shortly. What you cannot see from the example is that each provider consists of two fundamental aspects: A [factory](#factory) method which creates the value produced by the provider and the dependencies necessary to produce that value. For now, however, we don't need to concern ourselves with that just yet. In many cases, the creation of a provider's factory method and dependencies can be handled implicitly by a specialized provider, just like those in the example above.
+
+> To read more about how to create and define factories and dependencies for providers manually, take a look at the [`BaseProvider`](#baseprovider) and [`Factory`](#factory) sections below.
+
+More often than not, an application's dependencies fall into one of three categories:
+
+- instances of a particular class
+- shared, single(-ton) instances of a particular class (often referred to as services)
+- concrete, dependency-less values (like configurations or environment variables)
+
+To make it easy to provide these types of dependencies `Injector` includes three specialized providers, all of which create their factory method and dependencies implicitly:
+
+#### ClassProvider
+
+The `ClassProvider` is used to provide instances of a class. You will rarely have to create a `ClassProvider` yourself as `Injector` automatically creates them for `@injectable()` classes.
+
+```typescript
+@injectable()
+class Service {}
+
+@injectable()
+class Client {
+
+    constructor(public service: Service) {}
+}
+
+const injector = new Injector();
+const client = injector.resolve(Client);
+
+client instanceof Client; // --> true
+client.service instanceof Service; // --> true
+```
+
+As you might have noticed in the example above, we didn't have to create a provider for `Client` or `Service`. Consequently, we didn't have to register any provider with the injector either. `Injector` will use [reflection](#reflection) to analyse `Client` and its dependency `Service` and creates the appropriate `ClassProvider`s for us.
+
+In some cases it can still be useful to create a `ClassProvider` manually. As with all specialized providers the creation of a new provider instance is straight forward: Simply pass a reference of the desired class into the `ClassProvider`'s constructor and the `ClassProvider` will create a factory that produces instances of that class by itself. If the class has any dependencies of its own the `ClassProvider` will extract them and resolve and apply them accordingly when providing new instances. Assume the following example:
+
+```typescript
+// an interface representing a generic message service
+interface MessageService {}
+
+// as always, we need an InjectToken to refer to an interface
+const MESSAGE_SERVICE = new InjectToken<MessageService>('MessageService');
+
+// a concrete implementation of a message service
+@injectable()
+class ConcreteMessageService implements MessageService {}
+
+// a consumer that depends on a message service instance
+@injectable()
+class MessageClient {
+
+    constructor (@inject(MESSAGE_SERVICE) public: service: MessageService) {}
+}
+
+const injector = new Injector();
+
+// register a ClassProvider for the MessageService token that creates ConcreteMessageService instances
+// notice how we don't need to specify a generic type <MessageService> for the provider, as the
+// ClassProvider infers its type from the class that is passed into its constructor
+injector.provide(MESSAGE_SERVICE, new ClassProvider(ConcreteMessageService));
+
+const client = injector.resolve(MessageClient);
+
+client.service instanceof ConcreteMessageService; // --> true
+```
+
+In this example we have a generic `MessageService` interface, which we use to type the `MessageClient`'s `service` property. At runtime we want to provide our client with a concrete implementation of a `MessageService`. We achieve this by registering a `ClassProvider` for the `MessageService`'s `InjectToken` which provides instances of the `ConcreteMessageService` class.
+
+> **Note:** When creating a `ClassProvider` for a class, the provider will not only create a factory method for creating instances of the class, but it will also analyse the class's dependencies and implicitly extract the parameter and property dependencies of that class.
+
+#### SingletonProvider
+
+The `SingletonProvider` is used to always provide the same, single instance of a class. Basically any class that is used to share resources between other classes and/or maintains shared state is a good candidate for a `SingletonProvider`.
+
+```typescript
+@injectable()
+class MessageArchive {
+    archiveMessage (message: string) { ... }
+    getMessages (): string[] { ... }
+}
+
+@injectable()
+class MessageClient {
+
+    constructor (public archive: MessageArchive) {}
+}
+
+const injector = new Injector();
+
+// register a SingletonProvider for the MessageArchive class
+// notice how we don't need to specify a generic type <MessageArchive> for the provider, as the
+// SingletonProvider infers its type from the class that is passed into its constructor
+injector.register(MessageArchive, new SingletonProvider(MessageArchive));
+
+const client1 = injector.resolve(MessageClient);
+const client2 = injector.resolve(MessageClient);
+
+client1.archive === client2.archive; // --> true
+```
+
+In the example above we want to use an instance of the `MessageArchive` class which lets us archive all our received messages and retrieve all archived messages. If we want each of our clients to have access to all the archived messages we need to ensure that `Injector` always uses the same instance of `MessageArchive` and shares that instance with all its dependants. We can easily achieve that by registering a `SingletonProvider` for the class.
+
+> **Note**: The `SingletonProvider` extends the `ClassProvider` and handles class dependencies automatically in the same fashion.
+
+#### ValueProvider
+
+The `ValueProvider` is used to provide a concrete, dependency-less value. Configuration objects or environment variables are good examples for when you might want to use a `ValueProvider`. Just like `ClassProvider` and `SingletonProvider`, a `ValueProvider` can be instantiated with the desired value passed as constructor argument:
+
+```typescript
+// a type alias that restricts the possible values of Environment
+// this is completely optional, you could simply use a string
+type Environment = 'development' | 'production';
+
+// just like interfaces, type aliases can't be registered directly, so we need an InjectToken
+const ENV = new InjectToken<Environment>('Environment');
+
+@injectable()
+class MessageApp {
+
+    // use the @inject() decorator to inject the environment
+    constructor (@inject(ENV) public env: Environment) {}
+}
+
+const injector = new Injector();
+
+// register a ValueProvider for the Environment token
+injector.register(ENV, new ValueProvider<Environment>('production'));
+
+const app = injector.resolve(MessageApp);
+
+app.env === 'production'; // --> true
+```
+
+Besides these specialized providers, `Injector` has another, basic provider:
+
+#### BaseProvider
+
+The `BaseProvider` is the base class of all providers and can be used to provide a dependency that does not fall into any of the beforementioned categories. Whereas the specialized providers above create their factory and dependencies implicitly, you need to provide them explicitly with a `BaseProvider`.
+
+As mentioned before, each provider consists of a [factory](#factory) method which creates the value produced by the provider and the dependencies necessary to produce that value. A provider's dependencies can be optional and come in two flavors: parameter dependencies and property dependencies.
+
+**Parameter dependencies** are dependencies of the factory method itself. They map one-to-one to the arguments of the provider's factory method and tell the provider how to get the values to pass them into the factory method to produce its value.
+
+**Property dependencies** are very similar. However, they are not passed as arguments to the factory method, but rather applied as properties to the return value of the factory method once the factory has been invoked. Property dependencies are what enables property injection.
+
+To illustrate these concepts, let's assume a slightly more complex example: Imagine you want to provide a class's instances with an automatically generated, numerically ascending ID. Imagine further, you want to be able to specify a prefix for that ID and you want to able to change that prefix. None of the specialized providers can achieve that, yet both requirements can be met. We can create a factory method, which produces ascending numbers and which has a dependency on a prefix:
+
+```typescript
+// we start with a method which returns our factory and creates a closure to hold the last id
+const createFactory = () => {
+    lastId = 0;
+    return (prefix: string) => `${ prefix }-${ lastId++ }`;
+}
+
+// new we can create a provider which runs the factory and define the prefix dependency
+const idProvider = new BaseProvider(createFactory(), ['some-prefix']);
+
+// finally we create a token to associate the provider with
+const ID_TOKEN = new InjectToken<string>('IdToken');
+
+const injector = new Injector();
+
+// we register our provider with its token
+injector.register(ID_TOKEN, idProvider);
+
+injector.resolve(ID_TOKEN); // --> 'some-prefix-0'
+injector.resolve(ID_TOKEN); // --> 'some-prefix-1'
+```
+
+We can even go a step further and allow the ID-prefix to be configured through the provider instance. This would enable us to change the prefix not only in the injector's configuration but also inside of child providers:
+
+```typescript
+// create a token for the prefix
+const ID_PREFIX = new InjectToken<string>('IdPrefix');
+
+// change the provider to use a DependencyAnnotation instead of a plain value
+// using a DependencyAnnotation to define a dependency will cause the provider
+// to resolve the DependencyAnnotation's token from the injector
+const idProvider = new BaseProvider(createFactory(), [new DependencyAnnotation(ID_PREFIX)]);
+
+// to bring it all together, we inject the ID_TOKEN into a class
+@injectable()
+class User {
+
+    constructor (@inject(ID_TOKEN) public id: string) {}
+}
+
+const injector = new Injector();
+
+// we register the prefix token and the provider
+injector.register(ID_PREFIX, 'injector-prefix');
+injector.register(ID_TOKEN, idProvider);
+
+injector.resolve(User); // { id: 'injector-prefix-0' }
+injector.resolve(User); // { id: 'injector-prefix-1' }
+```
 
 ### Factory
 
@@ -324,7 +568,7 @@ There are a couple of things to note about the implementation. Firstly, each fac
 
 Secondly, the factory function itself is wrapped in another function `createClassFactory` - its own factory if you will. This is usefull to give the factory an isolated scope which can hold references to variables you want to store over multiple invocations of the factory. In this case it is used to hold a reference to `constructorFn`, the class who's instances the factory creates. This frees the `ClassProvider` from having to know about the class it provides. It can rely solely on the factory for that.
 
-Finally, let's create a custom factory. Assume you want to create a factory, that provides numbers in an ascending order:
+Finally, let's create a custom factory. Assume you want to create a factory, that creates numbers in an ascending order:
 
 ```typescript
 export interface AscendingNumberFactory extends Factory<number> {
