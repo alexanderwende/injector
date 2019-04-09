@@ -22,9 +22,10 @@ describe('Injector', () => {
         }
 
         const injector = new Injector();
+        const service = injector.resolve(Service)!;
 
-        expect(injector.resolve(Service)! instanceof Service).toBe(true);
-        expect(injector.resolve(Service)!.get()).toBe('foo');
+        expect(service instanceof Service).toBe(true);
+        expect(service.get()).toBe('foo');
     });
 
     it('should resolve tokens', () => {
@@ -43,11 +44,74 @@ describe('Injector', () => {
         injector.register(SERVICE, new ClassProvider(Service));
         injector.register(CONFIG, new ValueProvider({ foo: true }));
 
-        expect(injector.resolve(SERVICE)! instanceof Service).toBe(true);
-        expect(injector.resolve(SERVICE)!.get()).toBe('foo');
+        const service = injector.resolve(SERVICE)!;
+
+        expect(service instanceof Service).toBe(true);
+        expect(service.get()).toBe('foo');
 
         expect(injector.resolve(CONFIG)!).toEqual({ foo: true });
     });
+
+    it('should accept a configuration with a defaultProvider', () => {
+
+        @injectable()
+        class Service { }
+
+        const injector = new Injector({
+            defaultProvider: SingletonProvider
+        });
+
+        const service1 = injector.resolve(Service);
+        const service2 = injector.resolve(Service);
+
+        expect(service1 instanceof Service).toBe(true);
+        expect(service2 instanceof Service).toBe(true);
+
+        // when setting the default provider to SingletonProvider,
+        // injector should resolve classes as singletons
+        expect(service1).toBe(service2);
+    });
+
+    // it('should accept a configuration with providers', () => {
+
+    //     interface ServiceConfig {
+    //         optionA: boolean;
+    //         optionB: number;
+    //     }
+
+    //     const CONFIG = new InjectToken<ServiceConfig>('ServiceConfig');
+
+    //     @injectable()
+    //     class Service {
+
+    //         constructor (@inject(CONFIG) public config: ServiceConfig) { }
+    //     }
+
+    //     const SERVICE = new InjectToken<Service>('Service');
+
+    //     const config: Partial<InjectorConfiguration> = {
+    //         providers: [
+    //             {
+    //                 token: CONFIG,
+    //                 provider: new ValueProvider<ServiceConfig>({
+    //                     optionA: true,
+    //                     optionB: 3
+    //                 })
+    //             },
+    //             {
+    //                 token: SERVICE,
+    //                 provider: new SingletonProvider(Service)
+    //             }
+    //         ]
+    //     };
+
+    //     const injector = new Injector(config);
+
+    //     const service = injector.resolve(SERVICE)!;
+
+    //     expect(service instanceof Service).toBe(true);
+    //     expect(service.config).toEqual({ optionA: true, optionB: 3 });
+    // });
 
     it('should resolve class dependencies', () => {
 
@@ -174,7 +238,7 @@ describe('Injector', () => {
         class MessageService { }
 
         @injectable()
-        class ConcreteMessageService {
+        class ConcreteMessageService extends MessageService {
 
             getMessage (): string {
                 return 'message';
@@ -365,5 +429,61 @@ describe('Injector', () => {
         expect(twitterModule.client instanceof MessageClient).toBe(true);
         expect(twitterModule.client.service instanceof TwitterMessageService).toBe(true);
         expect(twitterModule.client.user.username).toBe('john');
+    });
+
+    it(`should inherit a parent injector's configuration`, () => {
+
+        @injectable()
+        class Service { }
+
+        const parentInjector = new Injector({ defaultProvider: SingletonProvider });
+
+        const childInjector = new Injector(parentInjector);
+
+        const service1 = childInjector.resolve(Service);
+        const service2 = childInjector.resolve(Service);
+
+        expect(service1 instanceof Service).toBe(true);
+        expect(service2 instanceof Service).toBe(true);
+
+        expect(service1).toBe(service2);
+    });
+
+    it('should accept a parent injector and a configuration', () => {
+
+        @injectable()
+        class ParentService { }
+
+        @injectable()
+        class ChildService { }
+
+        const parentInjector = new Injector({ defaultProvider: SingletonProvider });
+
+        const childInjector = new Injector(parentInjector, { defaultProvider: ClassProvider });
+
+        const parentService1 = parentInjector.resolve(ParentService)!;
+        const parentService2 = parentInjector.resolve(ParentService)!;
+
+        expect(parentService1 instanceof ParentService).toBe(true);
+        expect(parentService2 instanceof ParentService).toBe(true);
+        expect(parentService1).toBe(parentService2);
+
+        const parentService3 = childInjector.resolve(ParentService)!;
+        const parentService4 = childInjector.resolve(ParentService)!;
+
+        // this is to be expected, as the parent injector has already resolved a provider
+        // for ParentService, which the child injector will use before creating its own
+        expect(parentService3 instanceof ParentService).toBe(true);
+        expect(parentService4 instanceof ParentService).toBe(true);
+        expect(parentService3).toBe(parentService4);
+
+        const childService1 = childInjector.resolve(ChildService)!;
+        const childService2 = childInjector.resolve(ChildService)!;
+
+        // ChildService hasn't been resolved yet, so the child injector will
+        // create its own provider - a ClassProvider - for it
+        expect(childService1 instanceof ChildService).toBe(true);
+        expect(childService2 instanceof ChildService).toBe(true);
+        expect(childService1).not.toBe(childService2);
     });
 });
