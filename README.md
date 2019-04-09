@@ -50,7 +50,7 @@ A lightweight reflective dependency injection container.
 Injector is not yet published as npm module. However, you can directly install it from its git repository:
 
 ```shell
-npm install --save github:alexanderwende/injector.git#semver:^1.0.5
+npm install --save github:alexanderwende/injector.git#semver:^2.0.0
 ```
 
 Injector relies on the [Metadata Reflection API](https://rbuckton.github.io/reflect-metadata/), as used by TypeScript's decorators or Angular's DI. This API has not landed in browsers yet, so injector relies on a polyfill for that. There are several polyfills available, such as:
