@@ -1,6 +1,6 @@
-import { ParameterAnnotations, PropertyAnnotations } from '../annotations';
 import { Constructor } from '../utils';
 import { BaseProvider } from './base-provider';
+import { ParameterDependencies, PropertyDependencies } from './provider';
 /**
  * A provider for class instances
  *
@@ -35,6 +35,6 @@ import { BaseProvider } from './base-provider';
  * ```
  */
 export declare class ClassProvider<T> extends BaseProvider<T> {
-    constructor(constructorFn: Constructor<T>, parameters?: ParameterAnnotations, properties?: PropertyAnnotations);
+    constructor(constructorFn: Constructor<T>, parameters?: ParameterDependencies, properties?: PropertyDependencies);
 }
 //# sourceMappingURL=class-provider.d.ts.map

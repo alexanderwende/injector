@@ -1,7 +1,7 @@
-import { ParameterAnnotations, PropertyAnnotations } from '../annotations';
+import { DependencyAnnotation } from '../annotations';
 import { Factory } from '../factories';
 import { Injector } from '../injector';
-import { Provider } from './provider';
+import { ParameterDependencies, PropertyDependencies, Provider } from './provider';
 /**
  * @internal
  */
@@ -24,10 +24,10 @@ export declare const PROVIDER_UNREGISTERED: Error;
  *
  * const factory = (foo: Foo, bar: Bar) => ({ foo: foo, bar: bar });
  *
- * const provider = new BaseProvider(factory, new Map([
- *      [0, { token: Foo, optional: false }],
- *      [1, { token: Bar, optional: false }],
- * ]));
+ * const provider = new BaseProvider(factory, [
+ *      new DependencyAnnotation(Foo),
+ *      new DependencyAnnotation(Bar)
+ * ]);
  *
  * const injector = new Injector();
  *
@@ -49,9 +49,9 @@ export declare const PROVIDER_UNREGISTERED: Error;
  */
 export declare class BaseProvider<T> implements Provider<T> {
     factory: Factory<T>;
-    parameters: ParameterAnnotations;
-    properties: PropertyAnnotations;
     injector: Injector | undefined;
+    parameters: Map<number, DependencyAnnotation | any>;
+    properties: Map<PropertyKey, DependencyAnnotation | any>;
     /**
      * The `BaseProvider` constructor
      *
@@ -59,7 +59,7 @@ export declare class BaseProvider<T> implements Provider<T> {
      * @param parameters - The parameter dependencies of the factory function
      * @param properties - The property dependencies of the value returned from the factory function
      */
-    constructor(factory: Factory<T>, parameters?: ParameterAnnotations, properties?: PropertyAnnotations);
+    constructor(factory: Factory<T>, parameters?: ParameterDependencies, properties?: PropertyDependencies);
     /**
      * Get the provider's provided value
      *
@@ -68,14 +68,24 @@ export declare class BaseProvider<T> implements Provider<T> {
      */
     provide(injector?: Injector): T;
     /**
-     * Resolves the parameter dependencies for the factory from the current injector
+     * Resolves the parameter dependencies for the factory
+     *
+     * @remarks
+     * If a parameter dependency is a {@link DependencyAnnotation} it will be resolved
+     * from the current injector. Otherwise its value will be used to resolve the
+     * dependency.
      *
      * @param injector - The current injector that runs the provider
      * @returns An array of resolved parameter dependencies
      */
     protected resolveParameters(injector: Injector): any[];
     /**
-     * Resolves the property dependencies for the factory from the current injector
+     * Resolves the property dependencies for the factory
+     *
+     * @remarks
+     * If a property dependency is a {@link DependencyAnnotation} it will be resolved
+     * from the current injector. Otherwise its value will be used to resolve the
+     * dependency.
      *
      * @param injector - The current injector that runs the provider
      * @returns An object of resolved property dependencies
