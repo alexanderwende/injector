@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
+* add methods for updating dependency annotations
+* new types for parameter annotation arrays and property annotation maps
 * injector instance provides itself ([7799589](https://github.com/alexanderwende/injector/commit/7799589))
 * **injector:** allow to set a default provider for an injector ([fbc15d1](https://github.com/alexanderwende/injector/commit/fbc15d1))
 * **provider:** simplify defining provider dependencies ([ab2ef6b](https://github.com/alexanderwende/injector/commit/ab2ef6b))
@@ -31,22 +33,16 @@ All notable changes to this project will be documented in this file. See [standa
 * Injector's `provide` method is now called `register` for a clearer API
 * Provider.dependencies is now Provider.parameters to be less ambiguous about dependency type
 * BaseProvider.resolveDependencies is now BaseProvider.resolveParameters
-* * PropertyAnnotations and ParameterAnnotations are Maps now
+* PropertyAnnotations and ParameterAnnotations are Maps now
 * resolveDependencies, resolveProperties and createValue are now protected in BaseProvider
 * @inject no longer supports constructors as arguments.
 @inject should only be used to inject tokens or otherwise use the reflective type of the property or parameter which it decorates.
-
-* update tests
-* add documentation
-* add debug config for karma
-* * InjectToken can no longer be instantiated with a class or symbol to make its usage less ambiguous
+* InjectToken can no longer be instantiated with a class or symbol to make its usage less ambiguous
 * removed PropertyAnnotation and ParameterAnnotation interfaces and replaced with DependencyAnnotation
-* feat: add methods for updating dependency annotations
-* feat: new types for parameter annotation arrays and property annotation maps
+
 * ANNOTATION constant no longer exported
 * createParameterAnnotation no longer exists
 * createPropertyAnnotation no longer exists
-* add tests
 
 
 
