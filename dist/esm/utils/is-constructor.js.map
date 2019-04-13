@@ -1,0 +1,1 @@
+{"version":3,"file":"is-constructor.js","sourceRoot":"","sources":["../../../src/utils/is-constructor.ts"],"names":[],"mappings":"AAEA;;GAEG;AACH,MAAM,CAAC,MAAM,aAAa,GAAG,CAAC,aAAkB,EAAgC,EAAE;IAE9E,OAAO,aAAa,YAAY,QAAQ;WACjC,CAAC,CAAC,aAAa,CAAC,SAAS;WACzB,aAAa,CAAC,SAAS,CAAC,WAAW,KAAK,aAAa,CAAC;AACjE,CAAC,CAAC"}

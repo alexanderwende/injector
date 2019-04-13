@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1](https://github.com/alexanderwende/injector/compare/v2.0.0...v2.0.1) (2019-04-13)
+
+
+### Bug Fixes
+
+* make injector tree-shakeable ([5e510af](https://github.com/alexanderwende/injector/commit/5e510af))
+
+
+
 # [2.0.0](https://github.com/alexanderwende/injector/compare/v1.0.6...v2.0.0) (2019-04-09)
 
 

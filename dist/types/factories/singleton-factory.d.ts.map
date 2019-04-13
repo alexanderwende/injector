@@ -1,0 +1,1 @@
+{"version":3,"file":"singleton-factory.d.ts","sourceRoot":"","sources":["../../../src/factories/singleton-factory.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,UAAU,CAAC;AACvC,OAAO,EAAE,OAAO,EAAE,MAAM,WAAW,CAAC;AAEpC,MAAM,WAAW,gBAAgB,CAAC,CAAC,CAAE,SAAQ,OAAO,CAAC,CAAC,CAAC;IACnD,CAAC,GAAG,YAAY,EAAE,GAAG,EAAE,GAAG,CAAC,CAAC;CAC/B;AAED,eAAO,MAAM,sBAAsB,2DAUlC,CAAC"}
