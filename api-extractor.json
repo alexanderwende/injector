@@ -5,7 +5,7 @@
     "rootFolder": "."
   },
   "project": {
-    "entryPointSourceFile": "dist/index.d.ts"
+    "entryPointSourceFile": "dist/types/index.d.ts"
   },
   "apiReviewFile": {
     "enabled": false

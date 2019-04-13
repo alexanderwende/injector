@@ -10,8 +10,6 @@
       "@abraham/reflection",
       "@types/jasmine"
     ],
-    "declaration": true,
-    "declarationMap": true,
     "removeComments": false,
     "sourceMap": true,
     "outDir": "dist",
