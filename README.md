@@ -7,7 +7,7 @@ A lightweight reflective dependency injection container.
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
-- Minified Size: 4.53 KB
+- Minified Size: 4.54 KB
 - Gzipped Size: 1.63 KB
 - Brotli size: 1.48 KB
 
@@ -19,6 +19,9 @@ A lightweight reflective dependency injection container.
   - [Installation](#installation)
   - [Quickstart](#quickstart)
   - [Guide](#guide)
+    - [Introduction](#introduction)
+      - [What is injector?](#what-is-injector)
+      - [How does it work?](#how-does-it-work)
     - [Injector](#injector-1)
     - [InjectToken](#injecttoken)
     - [@injectable](#injectable)
@@ -115,12 +118,54 @@ client.service.getMessage(); // --> 'foo'
 
 ## Guide
 
+### Introduction
+
+#### What is injector?
+
+Injector is a reflective, hierarchical dependency injection container. Reflective means that it relies on reflection to identify and resolve dependencies. Hierarchical means that multiple `Injector` instances can co-exist in a hierarchical relation at different levels of an application.
+
+> **Want to know more?**
+> * For a more in-depth explanation of reflection and hierarchy please consult the [concepts](#concepts) section.
+> * If you're new to the concept of dependency injection in general, give this [article](https://medium.freecodecamp.org/a-quick-intro-to-dependency-injection-what-it-is-and-when-to-use-it-7578c84fa88f) a look.
+
+#### How does it work?
+
+On a fundamental level, the injector library consists of three parts: The `Injector` itself, `InjectToken`s and `Provider`s.
+
+The `Injector` class acts as the dependency injection container. It is responsible for knowing about your application's dependencies and also for creating them.
+
+An `InjectToken` is a simple class which represents a dependency. Each dependency needs to have one.
+
+A `Provider` is a class, which does the actual creation of a dependency. Providers are bound to the Injector via InjectTokens.
+
+<!-- TODO: Maybe use a graphic here? -->
+
 ### Injector
 
 The `Injector` class is the dependency injection container. It essentially maintains a list of [`InjectToken`](#injecttoken)s which represent dependencies and their associated [`Provider`](#provider)s which produce the dependencies. It exposes a simple API consisting of two methods:
 
 - `register` - to register an `InjectToken` with its `Provider`
 - `resolve` - to resolve an `InjectToken`
+
+To create an `Injector` instance, simply instantiate it:
+
+```typescript
+const injector = new Injector();
+```
+
+You can configure an injector instance to use an alternative default provider for classes:
+
+```typescript
+const injector = new Injector({ defaultProvider: SingletonProvider });
+```
+
+You can create a child injector, by passing its parent into the child injector's constructor:
+
+```typescript
+const parentInjector = new Injector();
+
+const childInjector = new Injector(parentInjector);
+```
 
 ### InjectToken
 
@@ -166,9 +211,13 @@ const injector = new Injector();
 
 injector.provide(USERNAME, new ValueProvider('John'));
 injector.provide(CONFIGURATION, new ClassProvider(SomeClassThatCreatesAConfig));
+
+const client = injector.resolve(MessageClient)!;
 ```
 
 After registering providers for our tokens we can successfully resolve `MessageClient` instances. As the example shows, `InjectToken`s don't limit us to use `ValueProviders`. We can just as easily provide a configuration through some class that creates instances that implement the `Configuration` interface. In fact, we can even create our own provider to handle the creation of the dependency in a customized way.
+
+> Read more about providers in the [`Provider`](#provider) section.
 
 ### @injectable
 
@@ -233,7 +282,7 @@ interface MessageService {
     getMessage (): string;
 }
 
-// an `InjectToken` representing the interface
+// an InjectToken representing the interface
 // use a generic type to tie the token to the interface type
 const MESSAGE_SERVICE = new InjectToken<MessageService>('MessageService');
 
@@ -250,7 +299,7 @@ class FooMessageService implements MessageService {
 @injectable()
 class MessageClient {
 
-    // inject the implementation by using the `@inject` decorator and the `InjectToken`
+    // inject the implementation by using the @inject decorator and the InjectToken
     constructor (@inject(MESSAGE_SERVICE) public service: MessageService) {}
 }
 
@@ -259,7 +308,7 @@ class MessageClient {
 const injector = new Injector();
 
 // tell the injector how to resolve the MESSAGE_SERVICE token
-// we are using a `ClassProvider` here, but we could use other providers as well
+// we are using a ClassProvider here, but we could use other providers as well
 injector.register(MESSAGE_SERVICE, new ClassProvider(FooMessageService));
 
 // create instances by letting the injector resolve them
