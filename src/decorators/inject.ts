@@ -1,6 +1,11 @@
-import { getParameterAnnotation, getPropertyAnnotation, setParameterAnnotation, setPropertyAnnotation } from '../annotations';
-import { InjectToken } from '../inject-token';
-import { Constructor } from '../utils';
+import {
+    getParameterAnnotation,
+    getPropertyAnnotation,
+    setParameterAnnotation,
+    setPropertyAnnotation
+} from '../annotations/index.js';
+import { InjectToken } from '../inject-token.js';
+import { Constructor } from '../utils/index.js';
 
 /**
  * Decorates a class property or constructor parameter as injection target

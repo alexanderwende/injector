@@ -1,8 +1,8 @@
-import { getTokenAnnotation } from './annotations';
-import { injectable } from './decorators';
-import { InjectToken } from './inject-token';
-import { ClassProvider, Provider, ValueProvider } from './providers';
-import { Constructor } from './utils';
+import { getTokenAnnotation } from './annotations/index.js';
+import { injectable } from './decorators/index.js';
+import { InjectToken } from './inject-token.js';
+import { ClassProvider, Provider, ValueProvider } from './providers/index.js';
+import { Constructor } from './utils/index.js';
 
 /**
  * @internal

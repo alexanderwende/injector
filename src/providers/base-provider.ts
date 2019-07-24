@@ -1,7 +1,7 @@
-import { DependencyAnnotation } from '../annotations';
-import { Factory } from '../factories';
-import { Injector } from '../injector';
-import { ParameterDependencies, PropertyDependencies, Provider } from './provider';
+import { DependencyAnnotation } from '../annotations/index.js';
+import { Factory } from '../factories/index.js';
+import { Injector } from '../injector.js';
+import { ParameterDependencies, PropertyDependencies, Provider } from './provider.js';
 
 /**
  * @internal

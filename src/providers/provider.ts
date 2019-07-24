@@ -1,6 +1,6 @@
-import { DependencyAnnotation, ParameterAnnotations, PropertyAnnotations } from '../annotations';
-import { Factory } from '../factories';
-import { Injector } from '../injector';
+import { DependencyAnnotation, ParameterAnnotations, PropertyAnnotations } from '../annotations/index.js';
+import { Factory } from '../factories/index.js';
+import { Injector } from '../injector.js';
 
 /**
  * A provider's parameter dependencies

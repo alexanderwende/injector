@@ -1,4 +1,4 @@
-import { Constructor } from './index';
+import { Constructor } from './constructor.js';
 
 /**
  * @internal

@@ -1,1 +1,1 @@
-export * from './annotations';
+export * from './annotations.js';

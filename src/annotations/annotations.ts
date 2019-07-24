@@ -1,6 +1,6 @@
-import { InjectToken } from '../inject-token';
-import { Constructor } from '../utils';
-import * as ANNOTATION from './metadata-keys';
+import { InjectToken } from '../inject-token.js';
+import { Constructor } from '../utils/index.js';
+import * as ANNOTATION from './metadata-keys.js';
 
 /**
  * A dependency annotation describes a dependency that should be resolved by an injector
