@@ -1,2 +1,2 @@
-export * from './constructor';
+export * from './constructor.js';
 //# sourceMappingURL=index.d.ts.map

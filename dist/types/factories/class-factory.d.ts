@@ -1,5 +1,5 @@
-import { Constructor } from '../utils';
-import { Factory } from './factory';
+import { Constructor } from '../utils/index.js';
+import { Factory } from './factory.js';
 export interface ClassFactory<T> extends Factory<T> {
     (...dependencies: any[]): T;
 }

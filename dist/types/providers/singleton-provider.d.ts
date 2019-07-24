@@ -1,5 +1,5 @@
-import { ClassProvider } from './class-provider';
-import { Injector } from '../injector';
+import { ClassProvider } from './class-provider.js';
+import { Injector } from '../injector.js';
 /**
  * A provider for singleton class instances
  *

@@ -1,5 +1,5 @@
-import { setTokenAnnotation } from '../annotations';
-import { InjectToken } from '../inject-token';
+import { setTokenAnnotation } from '../annotations/index.js';
+import { InjectToken } from '../inject-token.js';
 export const injectable = () => {
     return (target) => {
         const token = new InjectToken(target.name);

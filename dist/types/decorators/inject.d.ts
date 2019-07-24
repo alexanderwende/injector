@@ -1,4 +1,4 @@
-import { InjectToken } from '../inject-token';
+import { InjectToken } from '../inject-token.js';
 /**
  * Decorates a class property or constructor parameter as injection target
  *

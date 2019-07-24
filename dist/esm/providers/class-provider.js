@@ -1,6 +1,6 @@
-import { getParameterAnnotations, getPropertyAnnotations } from '../annotations';
-import { createClassFactory } from '../factories';
-import { BaseProvider } from './base-provider';
+import { getParameterAnnotations, getPropertyAnnotations } from '../annotations/index.js';
+import { createClassFactory } from '../factories/index.js';
+import { BaseProvider } from './base-provider.js';
 /**
  * A provider for class instances
  *

@@ -1,7 +1,7 @@
-export * from './annotations';
-export * from './decorators';
-export * from './factories';
-export * from './providers';
-export * from './inject-token';
-export * from './injector';
+export * from './annotations/index.js';
+export * from './decorators/index.js';
+export * from './factories/index.js';
+export * from './providers/index.js';
+export * from './inject-token.js';
+export * from './injector.js';
 //# sourceMappingURL=index.js.map

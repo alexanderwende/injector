@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const annotations_1 = require("../annotations");
+const index_js_1 = require("../annotations/index.js");
 exports.optional = () => {
     return (target, propertyKey, parameterIndex) => {
         if (typeof parameterIndex === 'number') {
             // decorator is a parameter decorator
-            annotations_1.setParameterAnnotation(target, parameterIndex, { optional: true });
+            index_js_1.setParameterAnnotation(target, parameterIndex, { optional: true });
         }
         else {
             // decorator is a property decorator
-            annotations_1.setPropertyAnnotation(target.constructor, propertyKey, { optional: true });
+            index_js_1.setPropertyAnnotation(target.constructor, propertyKey, { optional: true });
         }
     };
 };

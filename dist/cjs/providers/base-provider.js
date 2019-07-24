@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const annotations_1 = require("../annotations");
+const index_js_1 = require("../annotations/index.js");
 /**
  * @internal
  */
@@ -96,7 +96,7 @@ class BaseProvider {
     resolveParameters(injector) {
         const parameters = [];
         this.parameters.forEach((parameter, index) => {
-            parameters[index] = (parameter instanceof annotations_1.DependencyAnnotation)
+            parameters[index] = (parameter instanceof index_js_1.DependencyAnnotation)
                 ? injector.resolve(parameter.token, parameter.optional)
                 : parameter;
         });
@@ -116,7 +116,7 @@ class BaseProvider {
     resolveProperties(injector) {
         const properties = {};
         this.properties.forEach((property, key) => {
-            properties[key] = (property instanceof annotations_1.DependencyAnnotation)
+            properties[key] = (property instanceof index_js_1.DependencyAnnotation)
                 ? injector.resolve(property.token, property.optional)
                 : property;
         });

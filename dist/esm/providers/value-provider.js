@@ -1,5 +1,5 @@
-import { createValueFactory } from '../factories';
-import { BaseProvider } from './base-provider';
+import { createValueFactory } from '../factories/index.js';
+import { BaseProvider } from './base-provider.js';
 /**
  * A provider for static values
  *

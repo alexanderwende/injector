@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const annotations_1 = require("../annotations");
-const inject_token_1 = require("../inject-token");
+const index_js_1 = require("../annotations/index.js");
+const inject_token_js_1 = require("../inject-token.js");
 /**
  * Decorates a class property or constructor parameter as injection target
  *
@@ -69,17 +69,17 @@ const inject_token_1 = require("../inject-token");
 exports.inject = (injectToken) => {
     return (target, propertyKey, parameterIndex) => {
         const isParameterDecorator = typeof parameterIndex === 'number';
-        const token = injectToken instanceof inject_token_1.InjectToken
+        const token = injectToken instanceof inject_token_js_1.InjectToken
             ? injectToken
             : isParameterDecorator
-                ? annotations_1.getParameterAnnotation(target, parameterIndex).token
-                : annotations_1.getPropertyAnnotation(target.constructor, propertyKey).token;
+                ? index_js_1.getParameterAnnotation(target, parameterIndex).token
+                : index_js_1.getPropertyAnnotation(target.constructor, propertyKey).token;
         // TODO: This sets the token twice - once during the get (caused by ensure) and then by the set
         if (isParameterDecorator) {
-            annotations_1.setParameterAnnotation(target, parameterIndex, { token });
+            index_js_1.setParameterAnnotation(target, parameterIndex, { token });
         }
         else {
-            annotations_1.setPropertyAnnotation(target.constructor, propertyKey, { token });
+            index_js_1.setPropertyAnnotation(target.constructor, propertyKey, { token });
         }
     };
 };

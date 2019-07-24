@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const factories_1 = require("../factories");
-const base_provider_1 = require("./base-provider");
+const index_js_1 = require("../factories/index.js");
+const base_provider_js_1 = require("./base-provider.js");
 /**
  * A provider for static values
  *
@@ -26,9 +26,9 @@ const base_provider_1 = require("./base-provider");
  * injector.resolve(token)!; // --> { receiveMessages: true, answerMessages: false, channelId: 'some_id' }
  * ```
  */
-class ValueProvider extends base_provider_1.BaseProvider {
+class ValueProvider extends base_provider_js_1.BaseProvider {
     constructor(value) {
-        super(factories_1.createValueFactory(value));
+        super(index_js_1.createValueFactory(value));
     }
 }
 exports.ValueProvider = ValueProvider;

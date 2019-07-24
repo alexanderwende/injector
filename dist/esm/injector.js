@@ -8,10 +8,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var Injector_1;
-import { getTokenAnnotation } from './annotations';
-import { injectable } from './decorators';
-import { InjectToken } from './inject-token';
-import { ClassProvider, ValueProvider } from './providers';
+import { getTokenAnnotation } from './annotations/index.js';
+import { injectable } from './decorators/index.js';
+import { InjectToken } from './inject-token.js';
+import { ClassProvider, ValueProvider } from './providers/index.js';
 /**
  * @internal
  */

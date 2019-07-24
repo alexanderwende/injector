@@ -1,6 +1,6 @@
-import { InjectToken } from './inject-token';
-import { Provider } from './providers';
-import { Constructor } from './utils';
+import { InjectToken } from './inject-token.js';
+import { Provider } from './providers/index.js';
+import { Constructor } from './utils/index.js';
 /**
  * @internal
  */

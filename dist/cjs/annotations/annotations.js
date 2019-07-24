@@ -7,7 +7,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ANNOTATION = __importStar(require("./metadata-keys"));
+const ANNOTATION = __importStar(require("./metadata-keys.js"));
 /**
  * A dependency annotation describes a dependency that should be resolved by an injector
  *

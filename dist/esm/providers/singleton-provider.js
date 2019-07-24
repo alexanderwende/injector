@@ -1,4 +1,4 @@
-import { ClassProvider } from './class-provider';
+import { ClassProvider } from './class-provider.js';
 /**
  * A provider for singleton class instances
  *

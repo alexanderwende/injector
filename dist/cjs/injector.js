@@ -11,10 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Injector_1;
 "use strict";
-const annotations_1 = require("./annotations");
-const decorators_1 = require("./decorators");
-const inject_token_1 = require("./inject-token");
-const providers_1 = require("./providers");
+const index_js_1 = require("./annotations/index.js");
+const index_js_2 = require("./decorators/index.js");
+const inject_token_js_1 = require("./inject-token.js");
+const index_js_3 = require("./providers/index.js");
 /**
  * @internal
  */
@@ -39,7 +39,7 @@ let Injector = Injector_1 = class Injector {
     constructor(...args) {
         this._registry = new Map();
         this._parent = null;
-        this._config = { defaultProvider: providers_1.ClassProvider };
+        this._config = { defaultProvider: index_js_3.ClassProvider };
         const parent = (args.length && (args[0] instanceof Injector_1))
             ? args[0]
             : undefined;
@@ -57,7 +57,7 @@ let Injector = Injector_1 = class Injector {
             this._config = Object.assign({}, this._config, config);
         }
         // register the Injector instance itself
-        this.register(Injector_1, new providers_1.ValueProvider(this));
+        this.register(Injector_1, new index_js_3.ValueProvider(this));
     }
     // TODO: add an overload which allows to register multiple providers?
     // providers.forEach(({ token, provider }) => this.register(token, provider));
@@ -68,9 +68,9 @@ let Injector = Injector_1 = class Injector {
      * @param provider - The {@link Provider} which will be used to resolve the class or token
      */
     register(constructorOrToken, provider) {
-        const token = constructorOrToken instanceof inject_token_1.InjectToken
+        const token = constructorOrToken instanceof inject_token_js_1.InjectToken
             ? constructorOrToken
-            : annotations_1.getTokenAnnotation(constructorOrToken);
+            : index_js_1.getTokenAnnotation(constructorOrToken);
         // class was not decorated with @injectable, throw
         if (!token)
             throw exports.CLASS_NOT_PROVIDABLE(constructorOrToken);
@@ -87,7 +87,7 @@ let Injector = Injector_1 = class Injector {
      */
     resolve(target, optional = false) {
         let resolved;
-        if (target instanceof inject_token_1.InjectToken) {
+        if (target instanceof inject_token_js_1.InjectToken) {
             resolved = this._resolveToken(target, optional);
         }
         else {
@@ -99,7 +99,7 @@ let Injector = Injector_1 = class Injector {
      * @internal
      */
     _resolveConstructor(constructorFn, optional = false) {
-        const token = annotations_1.getTokenAnnotation(constructorFn);
+        const token = index_js_1.getTokenAnnotation(constructorFn);
         // class was not decorated with @injectable, throw if not optional
         if (!token) {
             if (!optional)
@@ -138,7 +138,7 @@ let Injector = Injector_1 = class Injector {
     }
 };
 Injector = Injector_1 = __decorate([
-    decorators_1.injectable(),
+    index_js_2.injectable(),
     __metadata("design:paramtypes", [Object])
 ], Injector);
 exports.Injector = Injector;

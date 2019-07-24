@@ -1,4 +1,4 @@
-import { Factory } from './factory';
+import { Factory } from './factory.js';
 export interface ValueFactory<T> extends Factory<T> {
     (): T;
 }

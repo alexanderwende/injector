@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const annotations_1 = require("../annotations");
-const factories_1 = require("../factories");
-const base_provider_1 = require("./base-provider");
+const index_js_1 = require("../annotations/index.js");
+const index_js_2 = require("../factories/index.js");
+const base_provider_js_1 = require("./base-provider.js");
 /**
  * A provider for class instances
  *
@@ -36,9 +36,9 @@ const base_provider_1 = require("./base-provider");
  * const fooBar = injector.resolve(FooBar)!;
  * ```
  */
-class ClassProvider extends base_provider_1.BaseProvider {
+class ClassProvider extends base_provider_js_1.BaseProvider {
     constructor(constructorFn, parameters, properties) {
-        super(factories_1.createClassFactory(constructorFn), parameters || annotations_1.getParameterAnnotations(constructorFn), properties || annotations_1.getPropertyAnnotations(constructorFn));
+        super(index_js_2.createClassFactory(constructorFn), parameters || index_js_1.getParameterAnnotations(constructorFn), properties || index_js_1.getPropertyAnnotations(constructorFn));
     }
 }
 exports.ClassProvider = ClassProvider;

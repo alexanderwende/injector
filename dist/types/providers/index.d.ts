@@ -1,6 +1,6 @@
-export * from './provider';
-export * from './base-provider';
-export * from './class-provider';
-export * from './singleton-provider';
-export * from './value-provider';
+export * from './provider.js';
+export * from './base-provider.js';
+export * from './class-provider.js';
+export * from './singleton-provider.js';
+export * from './value-provider.js';
 //# sourceMappingURL=index.d.ts.map

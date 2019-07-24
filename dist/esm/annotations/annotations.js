@@ -1,4 +1,4 @@
-import * as ANNOTATION from './metadata-keys';
+import * as ANNOTATION from './metadata-keys.js';
 /**
  * A dependency annotation describes a dependency that should be resolved by an injector
  *

@@ -1,2 +1,2 @@
-export * from './annotations';
+export * from './annotations.js';
 //# sourceMappingURL=index.js.map

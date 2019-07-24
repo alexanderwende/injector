@@ -1,4 +1,4 @@
-import { setParameterAnnotation, setPropertyAnnotation } from '../annotations';
+import { setParameterAnnotation, setPropertyAnnotation } from '../annotations/index.js';
 export const optional = () => {
     return (target, propertyKey, parameterIndex) => {
         if (typeof parameterIndex === 'number') {

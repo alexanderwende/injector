@@ -1,4 +1,4 @@
-import { DependencyAnnotation } from '../annotations';
+import { DependencyAnnotation } from '../annotations/index.js';
 /**
  * @internal
  */

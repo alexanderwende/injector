@@ -1,5 +1,5 @@
-import { InjectToken } from '../inject-token';
-import { Constructor } from '../utils';
+import { InjectToken } from '../inject-token.js';
+import { Constructor } from '../utils/index.js';
 /**
  * A dependency annotation describes a dependency that should be resolved by an injector
  *

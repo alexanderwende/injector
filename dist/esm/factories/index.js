@@ -1,4 +1,4 @@
-export * from './class-factory';
-export * from './singleton-factory';
-export * from './value-factory';
+export * from './class-factory.js';
+export * from './singleton-factory.js';
+export * from './value-factory.js';
 //# sourceMappingURL=index.js.map

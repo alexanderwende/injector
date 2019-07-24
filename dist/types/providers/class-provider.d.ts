@@ -1,6 +1,6 @@
-import { Constructor } from '../utils';
-import { BaseProvider } from './base-provider';
-import { ParameterDependencies, PropertyDependencies } from './provider';
+import { Constructor } from '../utils/index.js';
+import { BaseProvider } from './base-provider.js';
+import { ParameterDependencies, PropertyDependencies } from './provider.js';
 /**
  * A provider for class instances
  *

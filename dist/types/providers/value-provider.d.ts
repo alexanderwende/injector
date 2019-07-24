@@ -1,4 +1,4 @@
-import { BaseProvider } from './base-provider';
+import { BaseProvider } from './base-provider.js';
 /**
  * A provider for static values
  *
