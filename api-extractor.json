@@ -6,6 +6,7 @@
     },
     "apiReport": {
         "enabled": true,
+        "reportTempFolder": "tmp",
         "reportFolder": "./",
         "reportFileName": "report.api.md"
     },
